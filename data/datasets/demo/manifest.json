@@ -1,0 +1,49 @@
+{
+  "dataset_name": "agent1_demo_synthetic",
+  "schema_version": "agent1.1.0",
+  "created_at": "2026-07-28T07:45:42.248053+00:00",
+  "owner": "layout_agent",
+  "note": "Synthetic data aligned with 2d_service dim layout semantics (linear/diameter/radial + projection obstacles).",
+  "twod_service_root": "E:/workspace/2d_service",
+  "items": [
+    {
+      "state_path": "snapshots/case_clean.state.json",
+      "instance_image_path": "snapshots/case_clean.instance.png",
+      "legend_path": "snapshots/case_clean.legend.json",
+      "obstacle_image_path": "snapshots/case_clean.obstacle.png",
+      "tags": [
+        "synthetic",
+        "clean",
+        "has_diameter",
+        "has_linear"
+      ],
+      "split": "holdout"
+    },
+    {
+      "state_path": "snapshots/case_conflict.state.json",
+      "instance_image_path": "snapshots/case_conflict.instance.png",
+      "legend_path": "snapshots/case_conflict.legend.json",
+      "obstacle_image_path": "snapshots/case_conflict.obstacle.png",
+      "tags": [
+        "synthetic",
+        "conflict",
+        "has_diameter",
+        "has_linear"
+      ],
+      "split": "train"
+    },
+    {
+      "state_path": "snapshots/case_crowded.state.json",
+      "instance_image_path": "snapshots/case_crowded.instance.png",
+      "legend_path": "snapshots/case_crowded.legend.json",
+      "obstacle_image_path": "snapshots/case_crowded.obstacle.png",
+      "tags": [
+        "synthetic",
+        "crowded",
+        "has_diameter",
+        "has_linear"
+      ],
+      "split": "train"
+    }
+  ]
+}

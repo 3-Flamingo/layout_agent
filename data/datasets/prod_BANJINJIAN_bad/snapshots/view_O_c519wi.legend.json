@@ -1,0 +1,46 @@
+{
+  "color_space": "srgb",
+  "key_format": "hex_rrggbb",
+  "background": "000000",
+  "obstacle_reserved": [
+    "ffffff"
+  ],
+  "entries": {
+    "e6194b": {
+      "id": "pVnzoF0M",
+      "category": "linear"
+    },
+    "3cb44b": {
+      "id": "UEjg-yCK",
+      "category": "linear"
+    },
+    "4363d8": {
+      "id": "Q4UuaDsF",
+      "category": "linear"
+    },
+    "f58231": {
+      "id": "WgVSmlpI",
+      "category": "linear"
+    },
+    "911eb4": {
+      "id": "KbyoCKhk",
+      "category": "linear"
+    },
+    "42d4f4": {
+      "id": "ruYBH-3F",
+      "category": "linear"
+    },
+    "f032e6": {
+      "id": "p*PZDsLv",
+      "category": "linear"
+    },
+    "bfef45": {
+      "id": "*J8hxFY9",
+      "category": "diameter"
+    },
+    "fabed4": {
+      "id": "9rkq7wxL",
+      "category": "radial"
+    }
+  }
+}

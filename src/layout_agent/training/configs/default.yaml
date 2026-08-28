@@ -1,0 +1,20 @@
+# Local / small-GPU bootstrap (few hundred pairs).
+# For 8× A800 production training use a800_8x.yaml instead.
+img_size: 256
+channels: 3
+batch_size: 16
+epochs: 60
+lr: 3.0e-4
+weight_decay: 1.0e-2
+freeze_stages: 2
+pretrained: false
+patience: 10
+num_workers: 0
+seed: 7
+amp: fp16
+scale_lr: true
+tf32: true
+pin_memory: true
+persistent_workers: false
+prefetch_factor: 2
+find_unused_parameters: false

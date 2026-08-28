@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<title>RL 环境 rollout</title><style>
+body{margin:0;background:#16181c;color:#e8e8e8;font-family:"Segoe UI",sans-serif;line-height:1.55}
+main{max-width:1100px;margin:0 auto;padding:28px 24px 80px}
+h1{font-size:26px;font-weight:600;margin:0 0 8px}
+h2{font-size:20px;margin:40px 0 10px;border-bottom:1px solid #2a2e36;padding-bottom:8px}
+h3{font-size:15px;color:#bbb;font-weight:500}
+p,li{color:#c8c8c8;font-size:14px}
+.kicker{color:#8ab4f8;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.card{background:#1c1f26;border:1px solid #2a2e36;border-radius:8px;padding:16px;margin:14px 0}
+img{max-width:100%;border-radius:6px;border:1px solid #2a2e36;background:#000}
+.meta{font-size:12px;color:#888}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border-bottom:1px solid #2a2e36;padding:6px 8px;text-align:left}
+th{color:#aaa;font-weight:500}
+.ok{color:#5ac882} .bad{color:#e85c5c} .warn{color:#ffd644}
+.note{background:#22262e;padding:12px 14px;border-left:3px solid #56a0ff;margin:12px 0;font-size:13px;color:#bbb}
+</style></head><body><main>
+<p class="kicker">item 4 · 单独产出</p>
+<h1>RL 仿真环境 greedy rollout</h1>
+<p>环境是 <code>LayoutEnv</code>（Executor + Evaluator）。每步枚举合法离散动作，选使公式代价 P 下降最多的一步（不是已训练的策略）。用来说明：决策侧强化学习的仿真器已经闭环，剩下的是采样与 PPO。</p>
+<div class="note">奖励 = ΔP/100 − 0.05 步数惩罚；Accept 且硬约束清零时 +2 终局奖励。learned_quality 未接入奖励，避免 hack 未校准的学习维度。</div>
+<div class="card"><h3>动画</h3><img src="rollout/rollout.gif" alt="rollout gif"></div>
+<div class="card"><h3>分帧条带</h3><img src="rollout/strip.png" alt="strip"></div>
+<table><tr><th>step</th><th>动作</th><th>P</th><th>V_hard</th><th>reward</th></tr><tr><td>0</td><td>BalanceLinearSides</td><td>2020.0</td><td>20</td><td>17.09</td></tr><tr><td>1</td><td>SetLinearSide</td><td>306.0</td><td>3</td><td>0.95</td></tr><tr><td>2</td><td>Accept</td><td>206.0</td><td>2</td><td></td></tr></table>
+</main></body></html>

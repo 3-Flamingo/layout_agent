@@ -1,0 +1,1636 @@
+{
+  "schema_version": "agent1.1.0",
+  "state_id": "view_x6B6C5oj",
+  "created_at": "2026-07-31T08:32:25.881974+00:00",
+  "source": {
+    "drawing_id": "BANJINJIAN",
+    "solution_id": "1511437367716814848",
+    "solution_name": "BANJINJIAN",
+    "part_number": "TEF648106401",
+    "tenant_id": "250",
+    "view_id": "42920",
+    "view_uuid": "x6B6C5oj",
+    "view_type": "front",
+    "origin": "production_oss_doc",
+    "drawing_url": "https://v3.private.designorder.cn/drawing/?solutionId=1511437367716814848&tenantId=250"
+  },
+  "units": "mm",
+  "coords": {
+    "space": "view_local",
+    "y_up": true
+  },
+  "meta": {
+    "text_height": 5.0,
+    "revision": 1,
+    "phase_tag": "production",
+    "linear_count": 7,
+    "diameter_count": 1,
+    "radial_count": 2,
+    "obstacle_count": 51,
+    "render_conflicts": [
+      [
+        "Hs-*VUfN",
+        "btmHYwR8"
+      ],
+      [
+        "IVPO2Ugr",
+        "QvZNhf*O"
+      ],
+      [
+        "IVPO2Ugr",
+        "TtwEw8uA"
+      ],
+      [
+        "NZEpSn3q",
+        "QvZNhf*O"
+      ],
+      [
+        "NZEpSn3q",
+        "vXmrEZTn"
+      ],
+      [
+        "QvZNhf*O",
+        "vXmrEZTn"
+      ],
+      [
+        "TtwEw8uA",
+        "Z591W2vx"
+      ],
+      [
+        "TtwEw8uA",
+        "zygRpJQ8"
+      ],
+      [
+        "Z591W2vx",
+        "zygRpJQ8"
+      ],
+      [
+        "vSgcmz62",
+        "vXmrEZTn"
+      ],
+      [
+        "vSgcmz62",
+        "zygRpJQ8"
+      ]
+    ]
+  },
+  "view": {
+    "bbox": {
+      "min": {
+        "x": -352.50000000189175,
+        "y": -345.5000000018999
+      },
+      "max": {
+        "x": 390.50000000001455,
+        "y": 298.9375
+      }
+    }
+  },
+  "raster": {
+    "instance_image": "snapshots/view_x6B6C5oj.instance.png",
+    "obstacle_image": "snapshots/view_x6B6C5oj.obstacle.png",
+    "width": 2152,
+    "height": 1870,
+    "origin": {
+      "x": -357.50000000189175,
+      "y": 303.9375
+    },
+    "pixel_size": 0.35,
+    "y_down_image": true,
+    "anti_alias": false
+  },
+  "color_legend": {
+    "color_space": "srgb",
+    "key_format": "hex_rrggbb",
+    "background": "000000",
+    "obstacle_reserved": [
+      "ffffff"
+    ],
+    "entries": {
+      "e6194b": {
+        "id": "btmHYwR8",
+        "category": "linear"
+      },
+      "3cb44b": {
+        "id": "vSgcmz62",
+        "category": "linear"
+      },
+      "4363d8": {
+        "id": "QvZNhf*O",
+        "category": "linear"
+      },
+      "f58231": {
+        "id": "vXmrEZTn",
+        "category": "linear"
+      },
+      "911eb4": {
+        "id": "IVPO2Ugr",
+        "category": "linear"
+      },
+      "42d4f4": {
+        "id": "zygRpJQ8",
+        "category": "linear"
+      },
+      "f032e6": {
+        "id": "TtwEw8uA",
+        "category": "linear"
+      },
+      "bfef45": {
+        "id": "NZEpSn3q",
+        "category": "diameter"
+      },
+      "fabed4": {
+        "id": "Hs-*VUfN",
+        "category": "radial"
+      },
+      "469990": {
+        "id": "Z591W2vx",
+        "category": "chamfer"
+      }
+    }
+  },
+  "obstacles": [
+    {
+      "id": "loop_x6B6C5oj",
+      "kind": "polyline",
+      "raw_type": "view_loop",
+      "polyline": [
+        {
+          "x": -295.0,
+          "y": 0.0
+        },
+        {
+          "x": -295.0,
+          "y": 0.0
+        },
+        {
+          "x": -295.0,
+          "y": -245.0
+        },
+        {
+          "x": -290.0,
+          "y": -250.0
+        },
+        {
+          "x": 290.0,
+          "y": -250.0
+        },
+        {
+          "x": 295.0,
+          "y": -245.0
+        },
+        {
+          "x": 295.0,
+          "y": 245.0
+        },
+        {
+          "x": 290.0,
+          "y": 250.0
+        },
+        {
+          "x": 57.5,
+          "y": 250.0
+        },
+        {
+          "x": 52.5,
+          "y": 245.0
+        },
+        {
+          "x": 52.5,
+          "y": 230.0
+        },
+        {
+          "x": 52.25528258147577,
+          "y": 228.45491502812527
+        },
+        {
+          "x": 51.545084971874736,
+          "y": 227.06107373853763
+        },
+        {
+          "x": 50.43892626146236,
+          "y": 225.95491502812527
+        },
+        {
+          "x": 49.045084971874736,
+          "y": 225.24471741852423
+        },
+        {
+          "x": 47.5,
+          "y": 225.0
+        },
+        {
+          "x": -47.5,
+          "y": 225.0
+        },
+        {
+          "x": -49.045084971874736,
+          "y": 225.24471741852423
+        },
+        {
+          "x": -50.43892626146236,
+          "y": 225.95491502812527
+        },
+        {
+          "x": -51.545084971874736,
+          "y": 227.06107373853763
+        },
+        {
+          "x": -52.25528258147577,
+          "y": 228.45491502812527
+        },
+        {
+          "x": -52.5,
+          "y": 230.0
+        },
+        {
+          "x": -52.5,
+          "y": 245.0
+        },
+        {
+          "x": -57.5,
+          "y": 250.0
+        },
+        {
+          "x": -290.0,
+          "y": 250.0
+        },
+        {
+          "x": -295.0,
+          "y": 245.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "loop"
+    },
+    {
+      "id": "proj_CadLines_42924_0",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -295.0,
+          "y": -194.0
+        },
+        {
+          "x": 295.0,
+          "y": -194.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_1",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -52.5,
+          "y": 245.0
+        },
+        {
+          "x": -52.5,
+          "y": 230.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_2",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 295.0,
+          "y": 245.0
+        },
+        {
+          "x": 290.0,
+          "y": 250.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_3",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 295.0,
+          "y": -245.0
+        },
+        {
+          "x": 295.0,
+          "y": 245.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_4",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -245.0,
+          "y": -197.0
+        },
+        {
+          "x": -245.0,
+          "y": 197.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_5",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 295.0,
+          "y": 194.0
+        },
+        {
+          "x": -295.0,
+          "y": 194.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_6",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -295.0,
+          "y": 245.0
+        },
+        {
+          "x": -295.0,
+          "y": -245.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_7",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -295.0,
+          "y": -245.0
+        },
+        {
+          "x": -290.0,
+          "y": -250.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_8",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 290.0,
+          "y": -250.0
+        },
+        {
+          "x": 295.0,
+          "y": -245.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_9",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 245.0,
+          "y": 197.0
+        },
+        {
+          "x": 245.0,
+          "y": -197.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_10",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -47.5,
+          "y": 225.0
+        },
+        {
+          "x": 47.5,
+          "y": 225.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_11",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -290.0,
+          "y": -250.0
+        },
+        {
+          "x": 290.0,
+          "y": -250.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_12",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -290.0,
+          "y": 250.0
+        },
+        {
+          "x": -295.0,
+          "y": 245.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_13",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 57.5,
+          "y": 250.0
+        },
+        {
+          "x": 52.5,
+          "y": 245.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_14",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 290.0,
+          "y": 250.0
+        },
+        {
+          "x": 57.5,
+          "y": 250.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_15",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -57.5,
+          "y": 250.0
+        },
+        {
+          "x": -290.0,
+          "y": 250.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_16",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -52.5,
+          "y": 245.0
+        },
+        {
+          "x": -57.5,
+          "y": 250.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42924_17",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 52.5,
+          "y": 245.0
+        },
+        {
+          "x": 52.5,
+          "y": 230.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_0",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 84.0,
+          "y": 229.0
+        },
+        {
+          "x": 96.0,
+          "y": 229.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_1",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 90.0,
+          "y": 223.0
+        },
+        {
+          "x": 90.0,
+          "y": 235.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_2",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -286.0,
+          "y": 0.0
+        },
+        {
+          "x": -274.0,
+          "y": 0.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_3",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -280.0,
+          "y": -6.0
+        },
+        {
+          "x": -280.0,
+          "y": 6.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_4",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 274.0,
+          "y": 229.0
+        },
+        {
+          "x": 286.0,
+          "y": 229.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_5",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 280.0,
+          "y": 223.0
+        },
+        {
+          "x": 280.0,
+          "y": 235.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_6",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 84.0,
+          "y": -229.0
+        },
+        {
+          "x": 96.0,
+          "y": -229.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_7",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 90.0,
+          "y": -235.0
+        },
+        {
+          "x": 90.0,
+          "y": -223.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_8",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -96.0,
+          "y": -229.0
+        },
+        {
+          "x": -84.0,
+          "y": -229.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_9",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -90.0,
+          "y": -235.0
+        },
+        {
+          "x": -90.0,
+          "y": -223.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_10",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -96.0,
+          "y": 229.0
+        },
+        {
+          "x": -84.0,
+          "y": 229.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_11",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -90.0,
+          "y": 223.0
+        },
+        {
+          "x": -90.0,
+          "y": 235.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_12",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -286.0,
+          "y": -229.0
+        },
+        {
+          "x": -274.0,
+          "y": -229.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_13",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -280.0,
+          "y": -235.0
+        },
+        {
+          "x": -280.0,
+          "y": -223.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_14",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -286.0,
+          "y": 229.0
+        },
+        {
+          "x": -274.0,
+          "y": 229.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_15",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -280.0,
+          "y": 223.0
+        },
+        {
+          "x": -280.0,
+          "y": 235.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_16",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 274.0,
+          "y": -229.0
+        },
+        {
+          "x": 286.0,
+          "y": -229.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_17",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 280.0,
+          "y": -235.0
+        },
+        {
+          "x": 280.0,
+          "y": -223.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_18",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 274.0,
+          "y": 0.0
+        },
+        {
+          "x": 286.0,
+          "y": 0.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42949_19",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 280.0,
+          "y": -6.0
+        },
+        {
+          "x": 280.0,
+          "y": 6.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42950_0",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 0.0,
+          "y": -252.0
+        },
+        {
+          "x": 0.0,
+          "y": 252.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42950_1",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -297.0,
+          "y": 0.0
+        },
+        {
+          "x": 297.0,
+          "y": 0.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42925_0",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 243.4999392383646,
+          "y": -192.5000472352554
+        },
+        {
+          "x": 243.74527207200268,
+          "y": -192.98742874612088
+        },
+        {
+          "x": 244.08796486167248,
+          "y": -193.41203513832752
+        },
+        {
+          "x": 244.51257125387912,
+          "y": -193.75472792799732
+        },
+        {
+          "x": 244.9999527647446,
+          "y": -194.0000607616354
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42925_1",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 244.9999527647446,
+          "y": 194.0000607616354
+        },
+        {
+          "x": 244.51257125387912,
+          "y": 193.75472792799732
+        },
+        {
+          "x": 244.08796486167248,
+          "y": 193.41203513832752
+        },
+        {
+          "x": 243.74527207200268,
+          "y": 192.98742874612088
+        },
+        {
+          "x": 243.4999392383646,
+          "y": 192.5000472352554
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42925_2",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 245.0000607616354,
+          "y": -193.9999527647446
+        },
+        {
+          "x": 244.75472792799732,
+          "y": -193.51257125387912
+        },
+        {
+          "x": 244.41203513832752,
+          "y": -193.08796486167248
+        },
+        {
+          "x": 243.98742874612088,
+          "y": -192.74527207200268
+        },
+        {
+          "x": 243.5000472352554,
+          "y": -192.4999392383646
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42925_3",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -245.0000607616354,
+          "y": 193.9999527647446
+        },
+        {
+          "x": -244.75472792799732,
+          "y": 193.51257125387912
+        },
+        {
+          "x": -244.41203513832752,
+          "y": 193.08796486167248
+        },
+        {
+          "x": -243.98742874612088,
+          "y": 192.74527207200268
+        },
+        {
+          "x": -243.5000472352554,
+          "y": 192.4999392383646
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42925_4",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 47.5,
+          "y": 225.0
+        },
+        {
+          "x": 48.7940952255126,
+          "y": 225.17037086855467
+        },
+        {
+          "x": 50.0,
+          "y": 225.66987298107782
+        },
+        {
+          "x": 51.03553390593274,
+          "y": 226.46446609406726
+        },
+        {
+          "x": 51.83012701892219,
+          "y": 227.5
+        },
+        {
+          "x": 52.329629131445344,
+          "y": 228.7059047744874
+        },
+        {
+          "x": 52.5,
+          "y": 230.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42925_5",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 243.5000472352554,
+          "y": 192.4999392383646
+        },
+        {
+          "x": 243.98742874612088,
+          "y": 192.74527207200268
+        },
+        {
+          "x": 244.41203513832752,
+          "y": 193.08796486167248
+        },
+        {
+          "x": 244.75472792799732,
+          "y": 193.51257125387912
+        },
+        {
+          "x": 245.0000607616354,
+          "y": 193.9999527647446
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42925_6",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -243.5000472352554,
+          "y": -192.4999392383646
+        },
+        {
+          "x": -243.98742874612088,
+          "y": -192.74527207200268
+        },
+        {
+          "x": -244.41203513832752,
+          "y": -193.08796486167248
+        },
+        {
+          "x": -244.75472792799732,
+          "y": -193.51257125387912
+        },
+        {
+          "x": -245.0000607616354,
+          "y": -193.9999527647446
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42925_7",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -52.5,
+          "y": 230.0
+        },
+        {
+          "x": -52.329629131445344,
+          "y": 228.7059047744874
+        },
+        {
+          "x": -51.8301270189222,
+          "y": 227.5
+        },
+        {
+          "x": -51.03553390593274,
+          "y": 226.46446609406726
+        },
+        {
+          "x": -50.0,
+          "y": 225.66987298107782
+        },
+        {
+          "x": -48.794095225512606,
+          "y": 225.17037086855467
+        },
+        {
+          "x": -47.5,
+          "y": 225.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42925_8",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -244.9999527647446,
+          "y": -194.0000607616354
+        },
+        {
+          "x": -244.51257125387912,
+          "y": -193.75472792799732
+        },
+        {
+          "x": -244.08796486167248,
+          "y": -193.41203513832752
+        },
+        {
+          "x": -243.74527207200268,
+          "y": -192.98742874612088
+        },
+        {
+          "x": -243.4999392383646,
+          "y": -192.5000472352554
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42925_9",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -243.49998840577354,
+          "y": 192.5000142517057
+        },
+        {
+          "x": -243.74533193945246,
+          "y": 192.9873804830962
+        },
+        {
+          "x": -244.0880234403162,
+          "y": 193.4119765596838
+        },
+        {
+          "x": -244.5126195169038,
+          "y": 193.75466806054754
+        },
+        {
+          "x": -244.9999857482943,
+          "y": 194.00001159422646
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    }
+  ],
+  "linears": [
+    {
+      "id": "btmHYwR8",
+      "category": "linear",
+      "color": "e6194b",
+      "p1": {
+        "x": 90.00000000001455,
+        "y": 229.0
+      },
+      "p2": {
+        "x": -89.99999999998545,
+        "y": 229.0
+      },
+      "dir": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "point": {
+        "x": 1.4551915228366852e-11,
+        "y": 276.5
+      },
+      "value": 180.0,
+      "arrow_width": 10.0,
+      "text": {
+        "content": "180",
+        "width": 23.1,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "dim_angle": 0.0,
+      "text_point": {
+        "x": 1.4551915228366852e-11,
+        "y": 276.5
+      },
+      "dim_scale": 4.0,
+      "dimtih": false,
+      "dimtoh": false
+    },
+    {
+      "id": "vSgcmz62",
+      "category": "linear",
+      "color": "3cb44b",
+      "p1": {
+        "x": 245.00000000001455,
+        "y": 194.0
+      },
+      "p2": {
+        "x": 295.00000000001455,
+        "y": 194.0
+      },
+      "dir": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "point": {
+        "x": 270.00000000001455,
+        "y": 276.5
+      },
+      "value": 50.0,
+      "arrow_width": 10.0,
+      "text": {
+        "content": "50",
+        "width": 16.8,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "dim_angle": 0.0,
+      "text_point": {
+        "x": 270.00000000001455,
+        "y": 276.5
+      },
+      "dim_scale": 4.0,
+      "dimtih": false,
+      "dimtoh": false
+    },
+    {
+      "id": "QvZNhf*O",
+      "category": "linear",
+      "color": "4363d8",
+      "p1": {
+        "x": -279.99999999998545,
+        "y": 0.0
+      },
+      "p2": {
+        "x": 280.00000000001455,
+        "y": 0.0
+      },
+      "dir": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "point": {
+        "x": 1.4551915228366852e-11,
+        "y": -292.5000000018999
+      },
+      "value": 560.0,
+      "arrow_width": 10.0,
+      "text": {
+        "content": "560",
+        "width": 23.1,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "dim_angle": 0.0,
+      "text_point": {
+        "x": 1.4551915228366852e-11,
+        "y": -292.5000000018999
+      },
+      "dim_scale": 4.0,
+      "dimtih": false,
+      "dimtoh": false
+    },
+    {
+      "id": "vXmrEZTn",
+      "category": "linear",
+      "color": "f58231",
+      "p1": {
+        "x": 280.00000000001455,
+        "y": -229.0
+      },
+      "p2": {
+        "x": 280.00000000001455,
+        "y": 229.0
+      },
+      "dir": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "point": {
+        "x": 337.50000000001455,
+        "y": 0.0
+      },
+      "value": 458.0,
+      "arrow_width": 10.0,
+      "text": {
+        "content": "458",
+        "width": 23.1,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "dim_angle": 90.0,
+      "text_point": {
+        "x": 337.50000000001455,
+        "y": 0.0
+      },
+      "dim_scale": 4.0,
+      "dimtih": false,
+      "dimtoh": false
+    },
+    {
+      "id": "IVPO2Ugr",
+      "category": "linear",
+      "color": "911eb4",
+      "p1": {
+        "x": -246.49999999998545,
+        "y": -194.0
+      },
+      "p2": {
+        "x": -290.00000000189175,
+        "y": -249.9999999981
+      },
+      "dir": {
+        "x": -1.0,
+        "y": -4.104217968232897e-16
+      },
+      "point": {
+        "x": -337.50000000189175,
+        "y": -221.99999999905003
+      },
+      "value": 55.99999999810001,
+      "arrow_width": 10.0,
+      "text": {
+        "content": "56",
+        "width": 16.8,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "dim_angle": 90.0,
+      "text_point": {
+        "x": -337.50000000189175,
+        "y": -221.99999999905003
+      },
+      "dim_scale": 4.0,
+      "dimtih": false,
+      "dimtoh": false
+    },
+    {
+      "id": "zygRpJQ8",
+      "category": "linear",
+      "color": "42d4f4",
+      "p1": {
+        "x": 290.00000000001455,
+        "y": -249.99999999999994
+      },
+      "p2": {
+        "x": 290.00000000001455,
+        "y": 250.0
+      },
+      "dir": {
+        "x": 1.0,
+        "y": -3.32417654156772e-16
+      },
+      "point": {
+        "x": 375.50000000001455,
+        "y": 0.0
+      },
+      "value": 499.99999999999994,
+      "arrow_width": 10.0,
+      "text": {
+        "content": "500",
+        "width": 23.1,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "dim_angle": 90.0,
+      "text_point": {
+        "x": 375.50000000001455,
+        "y": 0.0
+      },
+      "dim_scale": 4.0,
+      "dimtih": false,
+      "dimtoh": false
+    },
+    {
+      "id": "TtwEw8uA",
+      "category": "linear",
+      "color": "f032e6",
+      "p1": {
+        "x": -294.9999999980937,
+        "y": -245.00000000189988
+      },
+      "p2": {
+        "x": 294.99999999810825,
+        "y": -245.00000000189988
+      },
+      "dir": {
+        "x": 8.509891946413363e-14,
+        "y": -1.0
+      },
+      "point": {
+        "x": 1.4551915228366852e-11,
+        "y": -330.5000000018999
+      },
+      "value": 589.999999996202,
+      "arrow_width": 10.0,
+      "text": {
+        "content": "590",
+        "width": 23.1,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "dim_angle": 0.0,
+      "text_point": {
+        "x": 1.4551915228366852e-11,
+        "y": -330.5000000018999
+      },
+      "dim_scale": 4.0,
+      "dimtih": false,
+      "dimtoh": false
+    }
+  ],
+  "diameters": [
+    {
+      "id": "NZEpSn3q",
+      "category": "diameter",
+      "color": "bfef45",
+      "anchor": {
+        "x": 280.00000000001455,
+        "y": -229.0
+      },
+      "path": [
+        {
+          "x": 280.00000000001455,
+          "y": -229.0
+        },
+        {
+          "x": 269.06250000001455,
+          "y": -253.62500000000003
+        },
+        {
+          "x": 258.12500000001455,
+          "y": -278.25000000000006
+        }
+      ],
+      "text": {
+        "content": "10xØ10",
+        "width": 46.2,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "allow_jog": true,
+      "dim_scale": 4.0
+    }
+  ],
+  "radials": [
+    {
+      "id": "Hs-*VUfN",
+      "category": "radial",
+      "color": "fabed4",
+      "anchor": {
+        "x": 47.499976435661665,
+        "y": 230.00002356434698
+      },
+      "path": [
+        {
+          "x": 47.499976435661665,
+          "y": 230.00002356434698
+        },
+        {
+          "x": 47.540533502804465,
+          "y": 234.99985907407176
+        },
+        {
+          "x": 47.93750000001455,
+          "y": 283.9375
+        }
+      ],
+      "text": {
+        "content": "2xR",
+        "width": 23.1,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "allow_jog": true,
+      "dim_scale": 4.0
+    },
+    {
+      "id": "Z591W2vx",
+      "category": "chamfer",
+      "color": "469990",
+      "anchor": {
+        "x": 292.5000000003056,
+        "y": -247.49999999969992
+      },
+      "path": [
+        {
+          "x": 292.5000000003056,
+          "y": -247.49999999969992
+        },
+        {
+          "x": 297.43750000016007,
+          "y": -260.18749999985
+        },
+        {
+          "x": 302.37500000001455,
+          "y": -272.87500000000006
+        }
+      ],
+      "text": {
+        "content": "6-C5",
+        "width": 30.800000000000004,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "allow_jog": true,
+      "dim_scale": 4.0
+    }
+  ],
+  "linear_groups": [
+    {
+      "group_id": "default_linear",
+      "member_ids": [
+        "btmHYwR8",
+        "vSgcmz62",
+        "QvZNhf*O",
+        "vXmrEZTn",
+        "IVPO2Ugr",
+        "zygRpJQ8",
+        "TtwEw8uA"
+      ]
+    }
+  ],
+  "relations": []
+}

@@ -1,0 +1,95 @@
+{
+  "dataset_name": "prod_TEF648102101",
+  "schema_version": "agent1.1.0",
+  "created_at": "2026-07-30T07:06:21.630451+00:00",
+  "owner": "layout_agent",
+  "note": "Real production drawing from designorder OSS via mistSolution/selectById",
+  "solution_id": "1511437367716814848",
+  "tenant_id": "250",
+  "solution_name": "BANJINJIAN",
+  "part_number": "TEF648102101",
+  "part_meta": {
+    "part_number": "TEF648102101",
+    "tree_node_ids": [
+      37411
+    ],
+    "view_group_ids": [
+      42287
+    ],
+    "tree_node_name": "TEF648102101"
+  },
+  "drawing_url": "https://v3.private.designorder.cn/drawing/?solutionId=1511437367716814848&tenantId=250",
+  "platform_project_url": "https://v3.private.designorder.cn/shanshe2/project/1509559398694100992?tenantId=250&app=shanshe2",
+  "raw_cache": "E:/workspace/layout_agent/data/raw/solution_1511437367716814848",
+  "items": [
+    {
+      "state_path": "snapshots/view_E5749cOT.state.json",
+      "instance_image_path": "snapshots/view_E5749cOT.instance.png",
+      "legend_path": "snapshots/view_E5749cOT.legend.json",
+      "obstacle_image_path": "snapshots/view_E5749cOT.obstacle.png",
+      "tags": [
+        "production",
+        "TEF648102101",
+        "front",
+        "L26",
+        "D2",
+        "R1"
+      ],
+      "split": "prod",
+      "solution_id": "1511437367716814848",
+      "part_number": "TEF648102101",
+      "view_uuid": "E5749cOT",
+      "view_type": "front",
+      "dim_count": 29,
+      "linear_count": 26,
+      "diameter_count": 2,
+      "radial_count": 1
+    },
+    {
+      "state_path": "snapshots/view_56jg4LFp.state.json",
+      "instance_image_path": "snapshots/view_56jg4LFp.instance.png",
+      "legend_path": "snapshots/view_56jg4LFp.legend.json",
+      "obstacle_image_path": "snapshots/view_56jg4LFp.obstacle.png",
+      "tags": [
+        "production",
+        "TEF648102101",
+        "top",
+        "L7",
+        "D0",
+        "R0"
+      ],
+      "split": "prod",
+      "solution_id": "1511437367716814848",
+      "part_number": "TEF648102101",
+      "view_uuid": "56jg4LFp",
+      "view_type": "top",
+      "dim_count": 7,
+      "linear_count": 7,
+      "diameter_count": 0,
+      "radial_count": 0
+    },
+    {
+      "state_path": "snapshots/view_dNopaSp1.state.json",
+      "instance_image_path": "snapshots/view_dNopaSp1.instance.png",
+      "legend_path": "snapshots/view_dNopaSp1.legend.json",
+      "obstacle_image_path": "snapshots/view_dNopaSp1.obstacle.png",
+      "tags": [
+        "production",
+        "TEF648102101",
+        "left",
+        "L3",
+        "D0",
+        "R0"
+      ],
+      "split": "prod",
+      "solution_id": "1511437367716814848",
+      "part_number": "TEF648102101",
+      "view_uuid": "dNopaSp1",
+      "view_type": "left",
+      "dim_count": 3,
+      "linear_count": 3,
+      "diameter_count": 0,
+      "radial_count": 0
+    }
+  ]
+}

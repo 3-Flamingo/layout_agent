@@ -1,0 +1,22 @@
+{
+  "color_space": "srgb",
+  "key_format": "hex_rrggbb",
+  "background": "000000",
+  "obstacle_reserved": [
+    "ffffff"
+  ],
+  "entries": {
+    "e6194b": {
+      "id": "8w3GoRaJ",
+      "category": "linear"
+    },
+    "3cb44b": {
+      "id": "ZRQOiBd1",
+      "category": "linear"
+    },
+    "4363d8": {
+      "id": "uUGnfg*o",
+      "category": "linear"
+    }
+  }
+}

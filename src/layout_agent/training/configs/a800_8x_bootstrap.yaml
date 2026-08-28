@@ -1,0 +1,22 @@
+# 8× A800 — bootstrap when the preference set is still hundreds of pairs.
+# Global batch = 8 × 8 = 64 → ~4–5 steps/epoch on ~300 train pairs.
+# Switch to a800_8x.yaml once R1+R2 reach thousands of pairs.
+
+img_size: 256
+channels: 3
+batch_size: 8
+epochs: 60
+lr: 3.0e-4
+weight_decay: 1.0e-2
+freeze_stages: 2
+pretrained: false
+patience: 12
+num_workers: 4
+seed: 7
+amp: bf16
+scale_lr: true
+tf32: true
+pin_memory: true
+persistent_workers: true
+prefetch_factor: 2
+find_unused_parameters: false

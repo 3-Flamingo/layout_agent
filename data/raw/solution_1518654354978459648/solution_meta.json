@@ -1,0 +1,147 @@
+{
+  "solutionAmount": "{\"bSymmetry\":false,\"amount\":1,\"bDefaultRight\":false,\"openState\":\"StaticState\"}",
+  "code": "solution",
+  "solutionFileType": "1392195039205543936",
+  "auth": 0,
+  "rootId": "1001804321065811968",
+  "spaceType": "1001144738807365632",
+  "projectType": "986622930571812864",
+  "pid": "1518643191821586432",
+  "type": "file",
+  "solutionProjectId": "1518643191821586432",
+  "path": "/1001804321065811968/1001804489534226432/1453117211666137088/1509555989437980672/1518643191821586432/1518654354978459648",
+  "modelJson": {
+    "data": {
+      "extension": {
+        "info": [
+          {
+            "id": 1,
+            "attr": "负责人",
+            "value": "",
+            "key": 1
+          },
+          {
+            "id": 2,
+            "attr": "所属企业",
+            "value": "",
+            "key": 2
+          },
+          {
+            "id": 3,
+            "attr": "创建日期",
+            "value": "",
+            "key": 3
+          }
+        ]
+      },
+      "pinHole": {
+        "diameter": "φ12",
+        "borderTwo": 5,
+        "color": "255,0,0",
+        "botType": 1,
+        "extensionType": 1,
+        "holeingDeep": 20,
+        "borderOne": 3
+      },
+      "threadHole": {
+        "diameter": "M 12",
+        "borderTwo": 5,
+        "color": "255,0,0",
+        "botType": 1,
+        "extensionType": 1,
+        "holeingDeep": 20,
+        "borderOne": 3
+      },
+      "simpleHole": {
+        "head": 1,
+        "diameter": "φ12",
+        "borderTwo": 5,
+        "color": "255, 0, 0",
+        "headDiameter": 3,
+        "botType": 1,
+        "extensionType": 1,
+        "holeingDeep": 20,
+        "headDeep": 5,
+        "borderOne": 3
+      },
+      "tree": [
+        {
+          "slots": {
+            "icon": "product"
+          },
+          "children": [
+            {
+              "slots": {
+                "icon": "product"
+              },
+              "children": [],
+              "name": "DATA",
+              "id": "2-1",
+              "type": "product"
+            },
+            {
+              "slots": {
+                "icon": "product"
+              },
+              "children": [],
+              "name": "GUN",
+              "id": "2-2",
+              "type": "product"
+            },
+            {
+              "slots": {
+                "icon": "product"
+              },
+              "children": [],
+              "name": "JIG",
+              "id": "2-3",
+              "type": "product"
+            }
+          ],
+          "name": "Product",
+          "id": "1-1",
+          "type": "product"
+        }
+      ],
+      "counterbore": {
+        "depth": 5,
+        "diameter": "φ12",
+        "borderTwo": 5,
+        "color": "255,0,0",
+        "botType": 1,
+        "extensionType": 1,
+        "angle": 3,
+        "holeingDeep": 20,
+        "borderOne": 3
+      },
+      "base": {
+        "thickness": 20,
+        "width": 1000,
+        "long": 1000
+      }
+    },
+    "name": "空白模板"
+  },
+  "resourceCode": "solution",
+  "updateBy": "-1",
+  "businessSort": 1,
+  "spaceRelTenantId": "250",
+  "id": "1518654354978459648",
+  "solutionSolutionThumbnail": "root/c8f36c2e343078c07e09e91dc9843e00f534f4ce.png",
+  "solutionDesignScene": "1250472934714912768",
+  "projectIndustry": "1250472709275267072",
+  "solutionDrawingAmount": "1",
+  "updateTime": "2026-08-04T07:26:41.000+00:00",
+  "solutionDesignType": "986622930571812864",
+  "community": "false",
+  "projectWebDocument": "root/eb2407477a91c9ce9d619e37402e7d682e8e77aa.json",
+  "solutionBusinessType": "986623611572215808",
+  "createBy": "2056268569744703489",
+  "spaceConfig": "root/5b4672461ca37bc0ce659e1043953306b6d1ee7b.json",
+  "createTime": "2026-06-22T08:30:13.000+00:00",
+  "spaceBranchLibrary": "1453117208377802752",
+  "name": "TE9712110700-1",
+  "relTenantId": "250",
+  "projectScene": "1250472934714912768",
+  "solutionSolutionWebDocument": "root/af91b2515b82680f12f82c3cb657b63dce5d98a2.json"
+}

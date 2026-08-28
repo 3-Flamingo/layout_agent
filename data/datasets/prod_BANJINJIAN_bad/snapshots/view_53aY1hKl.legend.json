@@ -1,0 +1,30 @@
+{
+  "color_space": "srgb",
+  "key_format": "hex_rrggbb",
+  "background": "000000",
+  "obstacle_reserved": [
+    "ffffff"
+  ],
+  "entries": {
+    "e6194b": {
+      "id": "ezSqWIOu",
+      "category": "linear"
+    },
+    "3cb44b": {
+      "id": "TVBoY72H",
+      "category": "linear"
+    },
+    "4363d8": {
+      "id": "A6pGEXUD",
+      "category": "linear"
+    },
+    "f58231": {
+      "id": "s9UkxSu-",
+      "category": "linear"
+    },
+    "911eb4": {
+      "id": "E31BXDfV",
+      "category": "linear"
+    }
+  }
+}

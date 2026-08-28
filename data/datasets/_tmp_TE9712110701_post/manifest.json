@@ -1,0 +1,75 @@
+{
+  "dataset_name": "prod_TE9712110701_",
+  "schema_version": "agent1.1.0",
+  "created_at": "2026-08-04T09:08:11.022958+00:00",
+  "owner": "layout_agent",
+  "note": "Real production drawing from designorder OSS via mistSolution/selectById",
+  "solution_id": "1518654354978459648",
+  "tenant_id": "250",
+  "solution_name": "TE9712110700-1",
+  "part_number": "TE9712110701_",
+  "part_numbers": [
+    "TE9712110701_"
+  ],
+  "part_meta": {
+    "part_number": "TE9712110701_",
+    "tree_node_ids": [
+      18
+    ],
+    "view_group_ids": [
+      296
+    ],
+    "tree_node_name": "TE9712110701_"
+  },
+  "drawing_url": "https://v3.private.designorder.cn/drawing/?solutionId=1518654354978459648&tenantId=250",
+  "platform_project_url": "https://v3.private.designorder.cn/shanshe2/project/1518643191821586432?tenantId=250&app=shanshe2",
+  "raw_cache": "E:/workspace/layout_agent/data/raw/solution_1518654354978459648",
+  "items": [
+    {
+      "state_path": "snapshots/view_qMz22veQ.state.json",
+      "instance_image_path": "snapshots/view_qMz22veQ.instance.png",
+      "legend_path": "snapshots/view_qMz22veQ.legend.json",
+      "obstacle_image_path": "snapshots/view_qMz22veQ.obstacle.png",
+      "tags": [
+        "production",
+        "TE9712110701_",
+        "front",
+        "L99",
+        "D1",
+        "R7"
+      ],
+      "split": "prod",
+      "solution_id": "1518654354978459648",
+      "part_number": "TE9712110701_",
+      "view_uuid": "qMz22veQ",
+      "view_type": "front",
+      "dim_count": 107,
+      "linear_count": 99,
+      "diameter_count": 1,
+      "radial_count": 7
+    },
+    {
+      "state_path": "snapshots/view_X_OdrfTw.state.json",
+      "instance_image_path": "snapshots/view_X_OdrfTw.instance.png",
+      "legend_path": "snapshots/view_X_OdrfTw.legend.json",
+      "obstacle_image_path": "snapshots/view_X_OdrfTw.obstacle.png",
+      "tags": [
+        "production",
+        "TE9712110701_",
+        "left",
+        "L1",
+        "D0",
+        "R0"
+      ],
+      "split": "prod",
+      "solution_id": "1518654354978459648",
+      "part_number": "TE9712110701_",
+      "view_uuid": "X*OdrfTw",
+      "view_type": "left",
+      "dim_count": 1,
+      "linear_count": 1,
+      "diameter_count": 0,
+      "radial_count": 0
+    }
+  ]
+}

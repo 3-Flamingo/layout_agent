@@ -1,0 +1,206 @@
+{
+  "dataset_name": "prod_070-3579",
+  "schema_version": "agent1.1.0",
+  "created_at": "2026-07-28T08:46:38.362689+00:00",
+  "owner": "layout_agent",
+  "note": "Real production drawing from designorder OSS via mistSolution/selectById",
+  "solution_id": "2082016429787918336",
+  "solution_name": "070-3579",
+  "drawing_url": "https://drawing.designorder.cn/?solutionId=2082016429787918336&tenantId=0",
+  "platform_project_url": "https://v3.designorder.cn/shanshe2/project/2081917103046832128?tenantId=0&app=shanshe2",
+  "raw_cache": "E:/workspace/layout_agent/data/raw/solution_2082016429787918336",
+  "items": [
+    {
+      "state_path": "snapshots/view_qyhsnUnf.state.json",
+      "instance_image_path": "snapshots/view_qyhsnUnf.instance.png",
+      "legend_path": "snapshots/view_qyhsnUnf.legend.json",
+      "obstacle_image_path": "snapshots/view_qyhsnUnf.obstacle.png",
+      "tags": [
+        "production",
+        "front",
+        "L27",
+        "D0",
+        "R1"
+      ],
+      "split": "prod",
+      "view_uuid": "qyhsnUnf",
+      "view_type": "front"
+    },
+    {
+      "state_path": "snapshots/view_QFWNu1zW.state.json",
+      "instance_image_path": "snapshots/view_QFWNu1zW.instance.png",
+      "legend_path": "snapshots/view_QFWNu1zW.legend.json",
+      "obstacle_image_path": "snapshots/view_QFWNu1zW.obstacle.png",
+      "tags": [
+        "production",
+        "front",
+        "L26",
+        "D0",
+        "R1"
+      ],
+      "split": "prod",
+      "view_uuid": "QFWNu1zW",
+      "view_type": "front"
+    },
+    {
+      "state_path": "snapshots/view_1DgsX4Uo.state.json",
+      "instance_image_path": "snapshots/view_1DgsX4Uo.instance.png",
+      "legend_path": "snapshots/view_1DgsX4Uo.legend.json",
+      "obstacle_image_path": "snapshots/view_1DgsX4Uo.obstacle.png",
+      "tags": [
+        "production",
+        "front",
+        "L19",
+        "D7",
+        "R1"
+      ],
+      "split": "prod",
+      "view_uuid": "1DgsX4Uo",
+      "view_type": "front"
+    },
+    {
+      "state_path": "snapshots/view_sqDCxW65.state.json",
+      "instance_image_path": "snapshots/view_sqDCxW65.instance.png",
+      "legend_path": "snapshots/view_sqDCxW65.legend.json",
+      "obstacle_image_path": "snapshots/view_sqDCxW65.obstacle.png",
+      "tags": [
+        "production",
+        "front",
+        "L16",
+        "D7",
+        "R1"
+      ],
+      "split": "prod",
+      "view_uuid": "sqDCxW65",
+      "view_type": "front"
+    },
+    {
+      "state_path": "snapshots/view_UPvsN1t-.state.json",
+      "instance_image_path": "snapshots/view_UPvsN1t-.instance.png",
+      "legend_path": "snapshots/view_UPvsN1t-.legend.json",
+      "obstacle_image_path": "snapshots/view_UPvsN1t-.obstacle.png",
+      "tags": [
+        "production",
+        "front",
+        "L15",
+        "D5",
+        "R1"
+      ],
+      "split": "prod",
+      "view_uuid": "UPvsN1t-",
+      "view_type": "front"
+    },
+    {
+      "state_path": "snapshots/view_X3GOL-xi.state.json",
+      "instance_image_path": "snapshots/view_X3GOL-xi.instance.png",
+      "legend_path": "snapshots/view_X3GOL-xi.legend.json",
+      "obstacle_image_path": "snapshots/view_X3GOL-xi.obstacle.png",
+      "tags": [
+        "production",
+        "front",
+        "L14",
+        "D5",
+        "R1"
+      ],
+      "split": "prod",
+      "view_uuid": "X3GOL-xi",
+      "view_type": "front"
+    },
+    {
+      "state_path": "snapshots/view_2pTVT4fU.state.json",
+      "instance_image_path": "snapshots/view_2pTVT4fU.instance.png",
+      "legend_path": "snapshots/view_2pTVT4fU.legend.json",
+      "obstacle_image_path": "snapshots/view_2pTVT4fU.obstacle.png",
+      "tags": [
+        "production",
+        "top",
+        "L13",
+        "D0",
+        "R1"
+      ],
+      "split": "prod",
+      "view_uuid": "2pTVT4fU",
+      "view_type": "top"
+    },
+    {
+      "state_path": "snapshots/view_afY1iTMd.state.json",
+      "instance_image_path": "snapshots/view_afY1iTMd.instance.png",
+      "legend_path": "snapshots/view_afY1iTMd.legend.json",
+      "obstacle_image_path": "snapshots/view_afY1iTMd.obstacle.png",
+      "tags": [
+        "production",
+        "front",
+        "L12",
+        "D0",
+        "R1"
+      ],
+      "split": "prod",
+      "view_uuid": "afY1iTMd",
+      "view_type": "front"
+    },
+    {
+      "state_path": "snapshots/view_l_yBdyvc.state.json",
+      "instance_image_path": "snapshots/view_l_yBdyvc.instance.png",
+      "legend_path": "snapshots/view_l_yBdyvc.legend.json",
+      "obstacle_image_path": "snapshots/view_l_yBdyvc.obstacle.png",
+      "tags": [
+        "production",
+        "front",
+        "L11",
+        "D0",
+        "R1"
+      ],
+      "split": "prod",
+      "view_uuid": "l_yBdyvc",
+      "view_type": "front"
+    },
+    {
+      "state_path": "snapshots/view_aHrcAQXV.state.json",
+      "instance_image_path": "snapshots/view_aHrcAQXV.instance.png",
+      "legend_path": "snapshots/view_aHrcAQXV.legend.json",
+      "obstacle_image_path": "snapshots/view_aHrcAQXV.obstacle.png",
+      "tags": [
+        "production",
+        "top",
+        "L8",
+        "D4",
+        "R0"
+      ],
+      "split": "prod",
+      "view_uuid": "aHrcAQXV",
+      "view_type": "top"
+    },
+    {
+      "state_path": "snapshots/view_bSfHeodK.state.json",
+      "instance_image_path": "snapshots/view_bSfHeodK.instance.png",
+      "legend_path": "snapshots/view_bSfHeodK.legend.json",
+      "obstacle_image_path": "snapshots/view_bSfHeodK.obstacle.png",
+      "tags": [
+        "production",
+        "left",
+        "L9",
+        "D2",
+        "R0"
+      ],
+      "split": "prod",
+      "view_uuid": "bSfHeodK",
+      "view_type": "left"
+    },
+    {
+      "state_path": "snapshots/view__1NT2PmU.state.json",
+      "instance_image_path": "snapshots/view__1NT2PmU.instance.png",
+      "legend_path": "snapshots/view__1NT2PmU.legend.json",
+      "obstacle_image_path": "snapshots/view__1NT2PmU.obstacle.png",
+      "tags": [
+        "production",
+        "top",
+        "L9",
+        "D2",
+        "R0"
+      ],
+      "split": "prod",
+      "view_uuid": "_1NT2PmU",
+      "view_type": "top"
+    }
+  ]
+}

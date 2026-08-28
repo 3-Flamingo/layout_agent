@@ -1,0 +1,72 @@
+agent:
+  max_steps: 12
+  timeout_ms: 180000
+  schema_version: "agent1.1.0"
+
+evaluate:
+  lambda_h: 100.0
+  lambda_s: 1.0
+  # Soft weights match 约束文档.md importance (out of 10)
+  soft_weights:
+    leader_text: 9.0
+    layer_order: 8.0
+    # text_in_part 已试验升为硬约束 H_TIN；下列权重仅作兼容保留
+    text_in_part: 9.5
+    path_len: 5.0
+    overcrowd: 4.0
+    side_balance: 3.0
+  text_in_part_as_hard: true
+  text_in_part_hard_scale: 0.95
+  overcrowd_threshold: 3
+  frame_pad: 5.0
+  path_scale: 0.02
+  # legacy keys kept for compatibility
+  alpha_if: 1.0
+  alpha_overcrowd: 0.5
+  alpha_path: 0.01
+  min_overlap_px: 8
+
+decide:
+  # 与 businessplatform_indi DeliveryProperties 对齐；决策默认走 LLM
+  use_llm: true
+  llm_temperature: 0.2
+  llm_enable_thinking: false
+  model: "deepseek-v4-pro"
+  base_url: "https://llm-e61q4da7pbj3wxqv.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+  # api_key 请用环境变量 DASHSCOPE_API_KEY / OPENAI_API_KEY，勿写入仓库
+
+# 调度大脑：每轮「决策→执行→评价」之后，决定是否继续下一轮决策
+schedule:
+  use_llm: true
+  min_improve: 0.5
+  patience: 2
+  stop_if_no_hard_fail: true
+  llm_temperature: 0.1
+  llm_enable_thinking: false
+
+execute:
+  # Offset from the measured edge (not the view bbox). Keep gaps small so
+  # extension lines stay near the feature and inside the raster.
+  side_gap: 8.0
+  layer_step: 4.0
+  max_layers: 6
+  max_gap: 28.0
+
+perceive:
+  pixel_size: 0.35
+  anti_alias: false
+  background: "000000"
+  obstacle_reserved: ["ffffff"]
+
+paths:
+  dataset_root: "data/datasets/prod_BANJINJIAN_bad"
+  twod_service_root: "E:/workspace/2d_service"
+  do_dimension_root: "E:/workspace/do_dimension"
+  # 可 import dodimension + docore + OCC 的解释器（layout_data_gen）
+  do_dimension_python: "E:/miniforge/envs/layout_data_gen/python.exe"
+  production:
+    solution_id: "1531286103392145408"
+    tenant_id: "250"
+    base_url: "https://api.private.designorder.cn/designBackend"
+    oss_prefix: "https://oss.private.designorder.cn/designorder/"
+    drawing_url: "https://v3.private.designorder.cn/drawing/?solutionId=1531286103392145408&tenantId=250"

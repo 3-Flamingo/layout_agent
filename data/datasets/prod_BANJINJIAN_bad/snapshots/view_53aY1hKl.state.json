@@ -1,0 +1,1111 @@
+{
+  "schema_version": "agent1.1.0",
+  "state_id": "view_53aY1hKl",
+  "created_at": "2026-07-31T08:32:27.091170+00:00",
+  "source": {
+    "drawing_id": "BANJINJIAN",
+    "solution_id": "1511437367716814848",
+    "solution_name": "BANJINJIAN",
+    "part_number": "TEF648106401",
+    "tenant_id": "250",
+    "view_id": "42951",
+    "view_uuid": "53aY1hKl",
+    "view_type": "left",
+    "origin": "production_oss_doc",
+    "drawing_url": "https://v3.private.designorder.cn/drawing/?solutionId=1511437367716814848&tenantId=250"
+  },
+  "units": "mm",
+  "coords": {
+    "space": "view_local",
+    "y_up": true
+  },
+  "meta": {
+    "text_height": 5.0,
+    "revision": 1,
+    "phase_tag": "production",
+    "linear_count": 5,
+    "diameter_count": 0,
+    "radial_count": 0,
+    "obstacle_count": 30,
+    "render_conflicts": [
+      [
+        "A6pGEXUD",
+        "E31BXDfV"
+      ],
+      [
+        "A6pGEXUD",
+        "ezSqWIOu"
+      ],
+      [
+        "E31BXDfV",
+        "ezSqWIOu"
+      ],
+      [
+        "TVBoY72H",
+        "ezSqWIOu"
+      ]
+    ]
+  },
+  "view": {
+    "bbox": {
+      "min": {
+        "x": -82.57007851100934,
+        "y": -388.50000000000006
+      },
+      "max": {
+        "x": 62.5,
+        "y": 265.0
+      }
+    }
+  },
+  "raster": {
+    "instance_image": "snapshots/view_53aY1hKl.instance.png",
+    "obstacle_image": "snapshots/view_53aY1hKl.obstacle.png",
+    "width": 444,
+    "height": 1896,
+    "origin": {
+      "x": -87.57007851100934,
+      "y": 270.0
+    },
+    "pixel_size": 0.35,
+    "y_down_image": true,
+    "anti_alias": false
+  },
+  "color_legend": {
+    "color_space": "srgb",
+    "key_format": "hex_rrggbb",
+    "background": "000000",
+    "obstacle_reserved": [
+      "ffffff"
+    ],
+    "entries": {
+      "e6194b": {
+        "id": "ezSqWIOu",
+        "category": "linear"
+      },
+      "3cb44b": {
+        "id": "TVBoY72H",
+        "category": "linear"
+      },
+      "4363d8": {
+        "id": "A6pGEXUD",
+        "category": "linear"
+      },
+      "f58231": {
+        "id": "s9UkxSu-",
+        "category": "linear"
+      },
+      "911eb4": {
+        "id": "E31BXDfV",
+        "category": "linear"
+      }
+    }
+  },
+  "obstacles": [
+    {
+      "id": "loop_53aY1hKl",
+      "kind": "polyline",
+      "raw_type": "view_loop",
+      "polyline": [
+        {
+          "x": 0.0,
+          "y": 250.0
+        },
+        {
+          "x": -1.5,
+          "y": 250.0
+        },
+        {
+          "x": -2.739498847853683,
+          "y": 195.52279346409162
+        },
+        {
+          "x": -2.3424221896556174,
+          "y": 195.65181921711417
+        },
+        {
+          "x": -1.9962910120866568,
+          "y": 195.8852945377446
+        },
+        {
+          "x": -1.7279216385150298,
+          "y": 196.20513105341715
+        },
+        {
+          "x": -1.5581058391429252,
+          "y": 196.5865496052895
+        },
+        {
+          "x": -3.0,
+          "y": 195.5000000033309
+        },
+        {
+          "x": -2.9127818855926537,
+          "y": 195.5025417739386
+        },
+        {
+          "x": -2.8258588018608473,
+          "y": 195.5101468770377
+        },
+        {
+          "x": -3.0000109229328342,
+          "y": 195.5
+        },
+        {
+          "x": -9.0,
+          "y": 195.5
+        },
+        {
+          "x": -9.927048574512046,
+          "y": 195.35317033149008
+        },
+        {
+          "x": -10.763351659098625,
+          "y": 194.9270539603301
+        },
+        {
+          "x": -11.427046517303951,
+          "y": 194.26336190353618
+        },
+        {
+          "x": -11.853166418446673,
+          "y": 193.42706061756942
+        },
+        {
+          "x": -12.0,
+          "y": 192.5
+        },
+        {
+          "x": -12.0,
+          "y": -192.5
+        },
+        {
+          "x": -11.853169548885461,
+          "y": -193.42705098312484
+        },
+        {
+          "x": -11.427050983124843,
+          "y": -194.26335575687742
+        },
+        {
+          "x": -10.76335575687742,
+          "y": -194.92705098312484
+        },
+        {
+          "x": -9.927050983124843,
+          "y": -195.35316954888546
+        },
+        {
+          "x": -9.0,
+          "y": -195.5
+        },
+        {
+          "x": -2.739524444749426,
+          "y": -195.52278961648582
+        },
+        {
+          "x": -2.825858801860846,
+          "y": -195.5101468770377
+        },
+        {
+          "x": -2.9127818855926533,
+          "y": -195.5025417739386
+        },
+        {
+          "x": -1.5,
+          "y": -197.0
+        },
+        {
+          "x": -1.5581058391429252,
+          "y": -196.5865496052895
+        },
+        {
+          "x": -1.7279216385150298,
+          "y": -196.20513105341715
+        },
+        {
+          "x": -1.9962910120866564,
+          "y": -195.8852945377446
+        },
+        {
+          "x": -2.342422189655618,
+          "y": -195.65181921711417
+        },
+        {
+          "x": -1.5,
+          "y": -197.0
+        },
+        {
+          "x": -1.5,
+          "y": -250.0
+        },
+        {
+          "x": 0.0,
+          "y": -250.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "loop"
+    },
+    {
+      "id": "proj_CadLines_42955_0",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -2.4791,
+          "y": -194.0456
+        },
+        {
+          "x": -2.7395,
+          "y": -195.5228
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_1",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 0.0,
+          "y": 194.0
+        },
+        {
+          "x": -9.0,
+          "y": 194.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_2",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -3.0,
+          "y": -195.5
+        },
+        {
+          "x": -3.0,
+          "y": -194.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_3",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -3.0,
+          "y": 194.0
+        },
+        {
+          "x": -3.0,
+          "y": 195.5
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_4",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -12.0,
+          "y": -192.5
+        },
+        {
+          "x": -12.0,
+          "y": 192.5
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_5",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 0.0,
+          "y": -194.0
+        },
+        {
+          "x": -9.0,
+          "y": -194.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_6",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -2.4791,
+          "y": 194.0456
+        },
+        {
+          "x": -2.7395,
+          "y": 195.5228
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_7",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -1.5,
+          "y": 250.0
+        },
+        {
+          "x": -1.5,
+          "y": -250.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_8",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -1.5,
+          "y": -245.0
+        },
+        {
+          "x": 0.0,
+          "y": -245.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_9",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": 0.0,
+          "y": 250.0
+        },
+        {
+          "x": 0.0,
+          "y": -250.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_10",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -1.5,
+          "y": 245.0
+        },
+        {
+          "x": 0.0,
+          "y": 245.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_11",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -1.5,
+          "y": 250.0
+        },
+        {
+          "x": 0.0,
+          "y": 250.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_12",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -1.5,
+          "y": -250.0
+        },
+        {
+          "x": 0.0,
+          "y": -250.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_13",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -9.0,
+          "y": 195.5
+        },
+        {
+          "x": -9.0,
+          "y": 194.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_14",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -9.0,
+          "y": -194.0
+        },
+        {
+          "x": -9.0,
+          "y": -195.5
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_15",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -3.0,
+          "y": 195.5
+        },
+        {
+          "x": -9.0,
+          "y": 195.5
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42955_16",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -3.0,
+          "y": -195.5
+        },
+        {
+          "x": -9.0,
+          "y": -195.5
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadLines_42965_0",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -14.0,
+          "y": 0.0
+        },
+        {
+          "x": 2.0,
+          "y": 0.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42956_0",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -3.0000000000000004,
+          "y": 195.5
+        },
+        {
+          "x": -2.6117714323462193,
+          "y": 195.5511112605664
+        },
+        {
+          "x": -2.25,
+          "y": 195.70096189432334
+        },
+        {
+          "x": -1.939339828220179,
+          "y": 195.93933982822017
+        },
+        {
+          "x": -1.7009618943233424,
+          "y": 196.25
+        },
+        {
+          "x": -1.5511112605663975,
+          "y": 196.61177143234622
+        },
+        {
+          "x": -1.5,
+          "y": 197.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42956_1",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -11.999972274475452,
+          "y": -192.5000430011757
+        },
+        {
+          "x": -11.366774995188635,
+          "y": -193.07668285653966
+        },
+        {
+          "x": -10.639052064286515,
+          "y": -193.5282043434366
+        },
+        {
+          "x": -9.84120110343848,
+          "y": -193.8394697632382
+        },
+        {
+          "x": -8.999970844977593,
+          "y": -194.00004363888502
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42956_2",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -3.0000000000000004,
+          "y": 194.0
+        },
+        {
+          "x": -2.6084227211381705,
+          "y": 194.02566524502046
+        },
+        {
+          "x": -2.2235453934806317,
+          "y": 194.10222184354723
+        },
+        {
+          "x": -1.8519533309721545,
+          "y": 194.2283598996742
+        },
+        {
+          "x": -1.5000045345006945,
+          "y": 194.40192117065678
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42956_3",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -8.99997084497759,
+          "y": 194.00004363888502
+        },
+        {
+          "x": -9.841201103438479,
+          "y": 193.8394697632382
+        },
+        {
+          "x": -10.639052064286515,
+          "y": 193.5282043434366
+        },
+        {
+          "x": -11.366774995188637,
+          "y": 193.07668285653966
+        },
+        {
+          "x": -11.999972274475454,
+          "y": 192.5000430011757
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42956_4",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -12.0,
+          "y": -192.5
+        },
+        {
+          "x": -11.897777478867205,
+          "y": -193.27645713530757
+        },
+        {
+          "x": -11.598076211353316,
+          "y": -194.0
+        },
+        {
+          "x": -11.121320343559642,
+          "y": -194.62132034355963
+        },
+        {
+          "x": -10.500000000000002,
+          "y": -195.09807621135332
+        },
+        {
+          "x": -9.776457135307561,
+          "y": -195.3977774788672
+        },
+        {
+          "x": -9.0,
+          "y": -195.5
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42956_5",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -9.0,
+          "y": 194.0
+        },
+        {
+          "x": -9.23338717462101,
+          "y": 193.98173223853786
+        },
+        {
+          "x": -9.461089734262956,
+          "y": 193.92737390229655
+        },
+        {
+          "x": -9.67756152420069,
+          "y": 193.83824899810267
+        },
+        {
+          "x": -9.8775299377384,
+          "y": 193.71652834260976
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42956_6",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -9.877223767094478,
+          "y": -193.71663045328995
+        },
+        {
+          "x": -9.67732097165266,
+          "y": -193.83829598578174
+        },
+        {
+          "x": -9.460925764725758,
+          "y": -193.9273843904202
+        },
+        {
+          "x": -9.233306478629096,
+          "y": -193.9817267313599
+        },
+        {
+          "x": -9.000004705792401,
+          "y": -193.99999999634508
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42956_7",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -9.0,
+          "y": 195.5
+        },
+        {
+          "x": -9.776457135307561,
+          "y": 195.3977774788672
+        },
+        {
+          "x": -10.5,
+          "y": 195.09807621135332
+        },
+        {
+          "x": -11.121320343559642,
+          "y": 194.62132034355963
+        },
+        {
+          "x": -11.598076211353316,
+          "y": 194.0
+        },
+        {
+          "x": -11.897777478867205,
+          "y": 193.27645713530757
+        },
+        {
+          "x": -12.0,
+          "y": 192.5
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42956_8",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -1.5000045345006956,
+          "y": -194.40192117065675
+        },
+        {
+          "x": -1.8519533309721545,
+          "y": -194.2283598996742
+        },
+        {
+          "x": -2.2235453934806335,
+          "y": -194.10222184354723
+        },
+        {
+          "x": -2.6084227211381714,
+          "y": -194.02566524502046
+        },
+        {
+          "x": -3.0,
+          "y": -194.0
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42956_9",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -2.7395244447494265,
+          "y": -195.52278961648582
+        },
+        {
+          "x": -2.804211290444972,
+          "y": -195.51283630580167
+        },
+        {
+          "x": -2.8692705145614905,
+          "y": -195.5057121386945
+        },
+        {
+          "x": -2.9345784415119542,
+          "y": -195.50143065798716
+        },
+        {
+          "x": -3.0000109229328866,
+          "y": -195.500000002643
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    },
+    {
+      "id": "proj_CadArcs_42956_10",
+      "kind": "polyline",
+      "raw_type": "VISIBLE_LINE",
+      "polyline": [
+        {
+          "x": -1.5,
+          "y": -197.0
+        },
+        {
+          "x": -1.5581073117692275,
+          "y": -196.58654446958997
+        },
+        {
+          "x": -1.7279273008355152,
+          "y": -196.20512199172427
+        },
+        {
+          "x": -1.9963029231331006,
+          "y": -195.8852838128524
+        },
+        {
+          "x": -2.3424413973871765,
+          "y": -195.65180984867496
+        },
+        {
+          "x": -2.739525155279333,
+          "y": -195.5227888250938
+        }
+      ],
+      "aabb": null,
+      "fill_role": "edge"
+    }
+  ],
+  "linears": [
+    {
+      "id": "ezSqWIOu",
+      "category": "linear",
+      "color": "e6194b",
+      "p1": {
+        "x": -12.0,
+        "y": -192.5
+      },
+      "p2": {
+        "x": 0.0,
+        "y": -250.00000000000006
+      },
+      "dir": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "point": {
+        "x": -6.0,
+        "y": -373.50000000000006
+      },
+      "value": 12.0,
+      "arrow_width": 10.0,
+      "text": {
+        "content": "12",
+        "width": 16.8,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "dim_angle": 0.0,
+      "text_point": {
+        "x": -45.33333333332848,
+        "y": -373.50000000000006
+      },
+      "dim_scale": 4.0,
+      "dimtih": false,
+      "dimtoh": false
+    },
+    {
+      "id": "TVBoY72H",
+      "category": "linear",
+      "color": "3cb44b",
+      "p1": {
+        "x": -12.0,
+        "y": 195.5
+      },
+      "p2": {
+        "x": -12.0,
+        "y": -195.5
+      },
+      "dir": {
+        "x": -1.0,
+        "y": 0.0
+      },
+      "point": {
+        "x": -59.5,
+        "y": 0.0
+      },
+      "value": 391.0,
+      "arrow_width": 10.0,
+      "text": {
+        "content": "391",
+        "width": 23.1,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "dim_angle": 270.0,
+      "text_point": {
+        "x": -59.5,
+        "y": 0.0
+      },
+      "dim_scale": 4.0,
+      "dimtih": false,
+      "dimtoh": false
+    },
+    {
+      "id": "A6pGEXUD",
+      "category": "linear",
+      "color": "4363d8",
+      "p1": {
+        "x": -9.0,
+        "y": -194.0
+      },
+      "p2": {
+        "x": 0.0,
+        "y": -194.0
+      },
+      "dir": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "point": {
+        "x": -4.5,
+        "y": -335.50000000000006
+      },
+      "value": 9.0,
+      "arrow_width": 10.0,
+      "text": {
+        "content": "9",
+        "width": 16.8,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "dim_angle": 180.0,
+      "text_point": {
+        "x": -35.666666666656965,
+        "y": -335.50000000000006
+      },
+      "dim_scale": 4.0,
+      "dimtih": false,
+      "dimtoh": false
+    },
+    {
+      "id": "s9UkxSu-",
+      "category": "linear",
+      "color": "f58231",
+      "p1": {
+        "x": 0.0,
+        "y": 250.0
+      },
+      "p2": {
+        "x": 0.0,
+        "y": 194.0
+      },
+      "dir": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "point": {
+        "x": 47.5,
+        "y": 222.0
+      },
+      "value": 56.0,
+      "arrow_width": 10.0,
+      "text": {
+        "content": "56",
+        "width": 16.8,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "dim_angle": 270.0,
+      "text_point": {
+        "x": 47.5,
+        "y": 222.0
+      },
+      "dim_scale": 4.0,
+      "dimtih": false,
+      "dimtoh": false
+    },
+    {
+      "id": "E31BXDfV",
+      "category": "linear",
+      "color": "911eb4",
+      "p1": {
+        "x": -1.5,
+        "y": -250.00000000000006
+      },
+      "p2": {
+        "x": 0.0,
+        "y": -250.00000000000006
+      },
+      "dir": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "point": {
+        "x": -0.75,
+        "y": -297.50000000000006
+      },
+      "value": 1.5,
+      "arrow_width": 10.0,
+      "text": {
+        "content": "1.5",
+        "width": 23.1,
+        "height": 16.099999999999998,
+        "dimtxt": 3.5,
+        "dim_scale": 4.0
+      },
+      "dim_angle": 180.0,
+      "text_point": {
+        "x": -67.57007851100934,
+        "y": -297.50000000000006
+      },
+      "dim_scale": 4.0,
+      "dimtih": false,
+      "dimtoh": false
+    }
+  ],
+  "diameters": [],
+  "radials": [],
+  "linear_groups": [
+    {
+      "group_id": "default_linear",
+      "member_ids": [
+        "ezSqWIOu",
+        "TVBoY72H",
+        "A6pGEXUD",
+        "s9UkxSu-",
+        "E31BXDfV"
+      ]
+    }
+  ],
+  "relations": []
+}

@@ -1,0 +1,30 @@
+{
+  "color_space": "srgb",
+  "key_format": "hex_rrggbb",
+  "background": "000000",
+  "obstacle_reserved": [
+    "ffffff"
+  ],
+  "entries": {
+    "e6194b": {
+      "id": "L_overall",
+      "category": "linear"
+    },
+    "3cb44b": {
+      "id": "L_seg",
+      "category": "linear"
+    },
+    "911eb4": {
+      "id": "L_mid",
+      "category": "linear"
+    },
+    "4363d8": {
+      "id": "D_hole",
+      "category": "diameter"
+    },
+    "f58231": {
+      "id": "R_fillet",
+      "category": "radial"
+    }
+  }
+}

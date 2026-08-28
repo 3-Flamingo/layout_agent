@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Layout Agent · 标注布局一期</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css?v=import3" />
+</head>
+<body>
+  <div class="page">
+    <header class="top">
+      <div class="brand">
+        <span class="mark"></span>
+        <div>
+          <h1>Layout Agent</h1>
+          <p>感知 · 评价 · 决策 · 执行 · 调度大脑</p>
+        </div>
+      </div>
+      <div class="meta" id="health">加载中…</div>
+    </header>
+
+    <aside class="sidebar">
+      <div class="dataset-card" id="dataset-meta">
+        <div class="dataset-k">当前数据集</div>
+        <div class="dataset-v" id="dataset-name">—</div>
+        <a class="dataset-link" id="dataset-link" href="#" target="_blank" rel="noopener" hidden>打开原图</a>
+      </div>
+
+      <div class="sidebar-section-head">
+        <h2>数据树</h2>
+        <span class="muted" id="view-count">0</span>
+      </div>
+      <div id="case-list" class="view-tree"></div>
+      <p class="hint">分层：方案 ID → 零件编号 → 视图。视图 / 零件旁可删除。选中视图后在右侧运行 Agent。</p>
+
+      <div class="import-card">
+        <div class="sidebar-section-head">
+          <h2>导入投图结果</h2>
+        </div>
+        <p class="hint import-hint">
+          粘贴 OSS key（如 <code>root/xxx.json</code>）下载 → 转 output → 写入数据树。
+          投图输入需先有 output.json，或勾选跑投图（需 OCC 环境）。
+        </p>
+        <div class="import-fields">
+          <label class="import-field">
+            <span class="import-k">OSS 下载地址</span>
+            <input id="import-oss-key" class="import-input" type="text" placeholder="root/6a6e95fd….json" autocomplete="off" />
+          </label>
+          <label class="import-field">
+            <span class="import-k">零件号（可选）</span>
+            <input id="import-part" class="import-input" type="text" placeholder="留空则用 key 名" autocomplete="off" />
+          </label>
+          <div class="import-field-pair">
+            <label class="import-field">
+              <span class="import-k">节点后缀</span>
+              <input id="import-suffix" class="import-input" type="text" value="·布局后" autocomplete="off" />
+            </label>
+            <label class="import-check">
+              <input id="import-run-parametric" type="checkbox" />
+              <span>跑投图</span>
+            </label>
+          </div>
+          <div class="import-field">
+            <span class="import-k">或本地 output.json</span>
+            <label class="import-file" for="import-file">
+              <input id="import-file" type="file" accept=".json,.gz,application/json" />
+              <span class="import-file-btn">选择文件</span>
+              <span class="import-file-name" id="import-file-name">未选择文件</span>
+            </label>
+          </div>
+        </div>
+        <button id="btn-import" class="btn import-submit" type="button">导入到数据树</button>
+        <p class="hint import-status" id="import-status" hidden></p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="panel run-panel">
+        <div class="run-hero">
+          <button id="btn-run" class="btn run-cta" disabled>
+            <span class="run-cta-label" id="run-cta-label">运行 Agent</span>
+            <span class="run-cta-sub" id="run-cta-sub">选择左侧视图后开始优化</span>
+          </button>
+          <div id="run-progress" class="run-progress" hidden>
+            <div class="run-progress-head">
+              <span id="run-phase">准备中</span>
+              <span id="run-pct">0%</span>
+            </div>
+            <div class="bar"><div id="run-bar" class="bar-fill"></div></div>
+            <div id="run-msg" class="run-msg">—</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel steps-panel" id="steps-panel">
+        <div class="panel-head">
+          <h2>步骤输出 <span id="steps-subtitle" class="muted">尚未运行</span></h2>
+          <div class="tabs" id="step-filter-tabs">
+            <button class="tab active" data-filter="all">全部</button>
+            <button class="tab" data-filter="decide">决策</button>
+            <button class="tab" data-filter="schedule">大脑</button>
+            <button class="tab" data-filter="evaluate">评价</button>
+            <button class="tab" data-filter="execute">执行</button>
+          </div>
+        </div>
+        <div id="step-cards" class="step-cards">
+          <div class="step-empty">点击右侧「运行 Agent」后，步骤会以可展开列表显示（默认收起，点击查看详情）。</div>
+        </div>
+      </section>
+
+      <section class="panel views">
+        <div class="panel-head">
+          <h2>图纸视图 <span id="current-view-label" class="muted"></span></h2>
+          <div class="tabs" id="view-tabs">
+            <button class="tab active" data-view="anno">标注几何</button>
+            <button class="tab" data-view="overlay">叠加 ICM</button>
+            <button class="tab" data-view="before">仅 ICM</button>
+            <button class="tab" data-view="after">优化后</button>
+            <button class="tab" data-view="diff">优化对比</button>
+            <button class="tab" data-view="obstacle">障碍</button>
+          </div>
+        </div>
+        <div class="view-toolbar">
+          <label class="chk"><input type="checkbox" id="tog-obs" checked /> 投影轮廓</label>
+          <label class="chk"><input type="checkbox" id="tog-linear" checked /> 线性</label>
+          <label class="chk"><input type="checkbox" id="tog-dia" checked /> 直径</label>
+          <label class="chk"><input type="checkbox" id="tog-rad" checked /> 半径</label>
+          <label class="chk"><input type="checkbox" id="tog-labels" checked /> 文字/尺寸</label>
+          <label class="chk"><input type="checkbox" id="tog-ids" /> 显示 ID</label>
+          <span class="spacer"></span>
+          <div class="zoom-tools">
+            <button type="button" class="btn ghost" id="btn-zoom-out" title="缩小">−</button>
+            <button type="button" class="btn ghost" id="btn-zoom-reset" title="复位">100%</button>
+            <button type="button" class="btn ghost" id="btn-zoom-in" title="放大">+</button>
+          </div>
+          <span id="pick-info" class="pick-info">滚轮缩放 · 拖拽平移 · 点击标注高亮</span>
+        </div>
+        <div id="diff-banner" class="diff-banner" hidden></div>
+        <div class="canvas-wrap" id="canvas-wrap">
+          <div class="canvas-stage" id="canvas-stage">
+            <canvas id="draw-canvas"></canvas>
+            <img id="icm-img" alt="instance color map" />
+          </div>
+          <div id="empty-view" class="empty">选择左侧样例</div>
+          <div id="tooltip" class="tooltip" hidden></div>
+        </div>
+        <div id="diff-list" class="diff-list" hidden></div>
+      </section>
+
+      <section class="panel metrics">
+        <h2>评价指标 <span class="muted" title="P 为综合惩罚分，越低越好">P ↓ 越低越好</span></h2>
+        <div id="metrics" class="metric-grid"></div>
+        <details class="collapse" id="violations-box">
+          <summary>硬约束冲突 <span id="violations-count" class="muted"></span></summary>
+          <ul id="violations" class="list"></ul>
+        </details>
+      </section>
+
+      <section class="panel legend">
+        <h2>ColorLegend</h2>
+        <div id="legend" class="legend-grid"></div>
+      </section>
+
+      <section class="panel annos">
+        <h2>标注对象 <span id="anno-count" class="muted"></span></h2>
+        <div id="annos" class="anno-tables"></div>
+      </section>
+
+      <section class="panel actions">
+        <h2>决策动作（汇总）</h2>
+        <pre id="actions" class="code">—</pre>
+      </section>
+    </main>
+  </div>
+  <script src="/static/app.js?v=import4"></script>
+</body>
+</html>

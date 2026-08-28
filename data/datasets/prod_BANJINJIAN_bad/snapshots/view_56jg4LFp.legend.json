@@ -1,0 +1,42 @@
+{
+  "color_space": "srgb",
+  "key_format": "hex_rrggbb",
+  "background": "000000",
+  "obstacle_reserved": [
+    "ffffff"
+  ],
+  "entries": {
+    "e6194b": {
+      "id": "f*SaUYtX",
+      "category": "linear"
+    },
+    "3cb44b": {
+      "id": "Ck-saKtg",
+      "category": "linear"
+    },
+    "4363d8": {
+      "id": "eineaxGg",
+      "category": "linear"
+    },
+    "f58231": {
+      "id": "BF2ftAF1",
+      "category": "linear"
+    },
+    "911eb4": {
+      "id": "FTzXsHfR",
+      "category": "linear"
+    },
+    "42d4f4": {
+      "id": "86y3cP8I",
+      "category": "linear"
+    },
+    "f032e6": {
+      "id": "57P5y31i",
+      "category": "linear"
+    },
+    "bfef45": {
+      "id": "RYO3OWko",
+      "category": "chamfer"
+    }
+  }
+}

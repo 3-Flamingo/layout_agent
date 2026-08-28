@@ -1,0 +1,33 @@
+# 8× NVIDIA A800 (80GB) — reward model training defaults.
+#
+# Launch:
+#   torchrun --standalone --nproc_per_node=8 -m layout_agent.training.train \
+#       --manifest data/evalsys/pairs_perturb/manifest.jsonl \
+#       --out runs/reward_a800 \
+#       --config src/layout_agent/training/configs/a800_8x.yaml
+#
+# Notes:
+# - batch_size is PER GPU → global batch = 64 × 8 = 512
+# - lr is base (1-GPU); train.py scales it linearly by world_size when scale_lr=true
+# - bf16 + TF32 are preferred on Ampere (A800); no GradScaler needed for bf16
+# - With only a few hundred pairs, consider freeze_stages: 2 and smaller epochs;
+#   bump freeze_stages to 0 / img_size 512 once R1+R2 reach thousands of pairs.
+
+img_size: 512
+channels: 3
+batch_size: 64
+epochs: 100
+lr: 3.0e-4
+weight_decay: 1.0e-2
+freeze_stages: 0
+pretrained: false
+patience: 15
+num_workers: 8
+seed: 7
+amp: bf16
+scale_lr: true
+tf32: true
+pin_memory: true
+persistent_workers: true
+prefetch_factor: 4
+find_unused_parameters: false

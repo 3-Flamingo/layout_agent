@@ -1,0 +1,34 @@
+{
+  "color_space": "srgb",
+  "key_format": "hex_rrggbb",
+  "background": "000000",
+  "obstacle_reserved": [
+    "ffffff"
+  ],
+  "entries": {
+    "e6194b": {
+      "id": "Xxk2y21X",
+      "category": "linear"
+    },
+    "3cb44b": {
+      "id": "LN-kV1gS",
+      "category": "linear"
+    },
+    "4363d8": {
+      "id": "jxWVuUvO",
+      "category": "linear"
+    },
+    "f58231": {
+      "id": "Dj6D4936",
+      "category": "linear"
+    },
+    "911eb4": {
+      "id": "1klaJ1Qh",
+      "category": "linear"
+    },
+    "42d4f4": {
+      "id": "2gen1oru",
+      "category": "linear"
+    }
+  }
+}

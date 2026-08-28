@@ -1,0 +1,58 @@
+{
+  "color_space": "srgb",
+  "key_format": "hex_rrggbb",
+  "background": "000000",
+  "obstacle_reserved": [
+    "ffffff"
+  ],
+  "entries": {
+    "e6194b": {
+      "id": "hQ6bOZTZ",
+      "category": "linear"
+    },
+    "3cb44b": {
+      "id": "xyRZUhBI",
+      "category": "linear"
+    },
+    "4363d8": {
+      "id": "mQOJ4kxV",
+      "category": "linear"
+    },
+    "f58231": {
+      "id": "l8xXX-Sx",
+      "category": "linear"
+    },
+    "911eb4": {
+      "id": "ddXkzbFh",
+      "category": "linear"
+    },
+    "42d4f4": {
+      "id": "Iuk-ahNS",
+      "category": "linear"
+    },
+    "f032e6": {
+      "id": "rvoLk25-",
+      "category": "linear"
+    },
+    "bfef45": {
+      "id": "rldHnMyZ",
+      "category": "linear"
+    },
+    "fabed4": {
+      "id": "dJYV2gIv",
+      "category": "diameter"
+    },
+    "469990": {
+      "id": "wkkjBl_r",
+      "category": "diameter"
+    },
+    "dcbeff": {
+      "id": "Y-w-QSgM",
+      "category": "diameter"
+    },
+    "9a6324": {
+      "id": "1D0Xe1QF",
+      "category": "diameter"
+    }
+  }
+}
