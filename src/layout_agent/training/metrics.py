@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Sequence, Tuple, Union
+
+Score = Union[float, Sequence[float]]
 
 
 def spearman(xs: List[float], ys: List[float]) -> float:
@@ -32,28 +34,64 @@ def spearman(xs: List[float], ys: List[float]) -> float:
     return num / (dx * dy) if dx * dy else 0.0
 
 
+def _model_prefers(sa: Score, sb: Score, *, margin: float, force_choice: bool) -> str:
+    """Return ``a``, ``b``, or ``tie`` for which side the model ranks higher."""
+    if isinstance(sa, Sequence) and not isinstance(sa, (str, bytes)):
+        if tuple(sa) > tuple(sb):
+            return "a"
+        if tuple(sb) > tuple(sa):
+            return "b"
+        return "tie"
+    diff = float(sa) - float(sb)
+    if force_choice:
+        if diff > 0:
+            return "a"
+        if diff < 0:
+            return "b"
+        return "tie"
+    if abs(diff) <= margin:
+        return "tie"
+    return "a" if diff > 0 else "b"
+
+
 def pairwise_agreement(
-    scored: List[Tuple[float, float, str]], margin: float = 1e-6
-) -> Dict[str, float]:
-    """scored: (score_a, score_b, human_prefer 'a'|'b'|'tie') per pair."""
+    scored: List[Tuple[Score, Score, str]],
+    margin: float = 1e-6,
+    *,
+    force_choice: bool = False,
+) -> Dict[str, float | int]:
+    """Summarize pairwise ranking quality.
+
+    ``strict_accuracy`` is the main proxy metric: model ties and human ties
+    count as failures. ``agreement_rate`` is retained for compatibility, but
+    only measures pairs where the model made a non-tied decision.
+
+    ``force_choice`` matches the later human_pairs protocol (no 「差不多」):
+    any nonzero difference picks a side. Tuple ranking keys compare
+    lexicographically and only tie when every component is identical.
+    """
     agree = disagree = model_tie = human_tie = 0
     for sa, sb, prefer in scored:
         if prefer == "tie":
             human_tie += 1
             continue
-        if abs(sa - sb) <= margin:
+        choice = _model_prefers(sa, sb, margin=margin, force_choice=force_choice)
+        if choice == "tie":
             model_tie += 1
             continue
-        if ("a" if sa > sb else "b") == prefer:
+        if choice == prefer:
             agree += 1
         else:
             disagree += 1
     decided = agree + disagree
+    n = len(scored)
     return {
-        "n": len(scored),
+        "n": n,
         "agree": agree,
         "disagree": disagree,
         "model_tie": model_tie,
         "human_tie": human_tie,
         "agreement_rate": (agree / decided) if decided else 0.0,
+        "strict_accuracy": (agree / n) if n else 0.0,
+        "decided_coverage": (decided / n) if n else 0.0,
     }

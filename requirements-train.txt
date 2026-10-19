@@ -7,8 +7,11 @@
 #
 # Older Pascal GPUs (e.g. Quadro P620) need a matching driver + cu126 wheel:
 #   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+-r requirements.txt
+
 torch>=2.4
 torchvision>=0.19
+gymnasium>=1.0
 numpy>=1.26
 pyyaml>=6.0
 onnx>=1.16

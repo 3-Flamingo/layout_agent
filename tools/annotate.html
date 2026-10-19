@@ -4,85 +4,586 @@
 <meta charset="utf-8">
 <title>布局标注</title>
 <style>
-  body { background:#16181c; color:#e8e8e8; font-family:"Segoe UI",sans-serif; margin:0; }
-  header { display:flex; gap:16px; align-items:center; padding:10px 16px; background:#1f2228; position:sticky; top:0; }
+  html, body { height:100%; margin:0; overflow:hidden; }
+  body { background:#16181c; color:#e8e8e8; font-family:"Segoe UI",sans-serif; display:flex; flex-direction:column; }
+  header { flex-shrink:0; z-index:2; background:#1f2228; }
+  .toolbar {
+    display:flex; gap:12px; align-items:center; flex-wrap:nowrap;
+    padding:8px 16px; min-height:44px;
+  }
+  .toolbar-left { display:flex; gap:12px; align-items:center; flex:1; min-width:0; }
+  .toolbar-nav { display:flex; gap:8px; align-items:center; flex-shrink:0; }
+  #prev, #next { min-width:88px; }
+  .jump { display:flex; gap:6px; align-items:center; white-space:nowrap; font-size:13px; color:#ccc; }
+  #jump { width:4.8em; }
   header input { background:#2a2e36; color:#e8e8e8; border:1px solid #444; border-radius:4px; padding:4px 8px; }
   button { background:#2a2e36; color:#e8e8e8; border:1px solid #555; border-radius:4px; padding:6px 12px; cursor:pointer; }
   button:hover { background:#3a3f4a; }
   button.primary { background:#2d5be3; border-color:#2d5be3; }
   button.sel { background:#2d8a4e; border-color:#2d8a4e; }
-  #imgs { display:flex; gap:10px; justify-content:center; padding:12px; }
-  #imgs figure { margin:0; text-align:center; flex:1; max-width:48%; }
-  #imgs.single figure { max-width:90%; }
-  #imgs img { width:100%; border:1px solid #333; border-radius:4px; background:#000; }
-  #panel { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:8px 16px 24px; align-items:center; }
+  button.drop { background:#6b2d5a; border-color:#6b2d5a; }
+  button.drop.sel { background:#8a3d6a; }
+  a.live { color:#9ecbff; text-decoration:none; font-size:13px; white-space:nowrap; }
+  a.live[hidden] { display:none; }
+  #progress { white-space:nowrap; min-width:11em; }
+  .filter { display:flex; gap:4px; align-items:center; white-space:nowrap; font-size:13px; color:#ccc; user-select:none; cursor:pointer; }
+  .filter input { margin:0; }
+  #hint { white-space:nowrap; }
+  #viewmeta {
+    display:block; color:#bbb; font-size:12px; font-family:ui-monospace,Consolas,monospace;
+    line-height:1.55; padding:0 16px 8px; min-height:1.55em;
+  }
+  #viewmeta button { margin-left:6px; padding:2px 8px; font-size:12px; }
+  #panel { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:center; padding:8px 16px; background:#1a1d23; border-bottom:1px solid #2a2e36; flex-shrink:0; z-index:2; }
+  #imgs { flex:1; min-height:0; display:flex; gap:10px; justify-content:center; align-items:stretch; padding:8px 12px 12px; overflow:hidden; }
+  #imgs figure { margin:0; text-align:center; flex:1; min-width:0; min-height:0; display:flex; flex-direction:column; }
+  #imgs.single figure { flex:1 1 auto; max-width:min(1100px, 96%); }
+  #imgs .frame { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  #imgs img {
+    max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain;
+    border:1px solid #333; border-radius:4px; background:#000; cursor:zoom-in;
+  }
+  .stack-box {
+    position:relative; max-width:100%; max-height:100%; line-height:0;
+  }
+  .stack-box img.layer-a {
+    display:block; max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain;
+  }
+  .stack-box img.layer-b {
+    position:absolute; left:0; top:0; width:100%; height:100%; object-fit:fill; border:none;
+  }
+  .mode-blink .layer-b { opacity:0; }
+  .mode-blink.show-b .layer-b { opacity:1; }
+  .mode-diff { background:#000; }
+  .mode-diff .layer-b { mix-blend-mode:difference; }
+  .mode-wipe .layer-b { clip-path: inset(0 0 0 var(--wipe, 50%)); }
+  .wipe-line {
+    position:absolute; top:0; bottom:0; left:var(--wipe, 50%); width:2px;
+    background:#4c8dff; box-shadow:0 0 0 1px #000; pointer-events:none;
+  }
+  .cmp {
+    display:flex; gap:6px; align-items:center; flex-wrap:wrap;
+    margin-left:12px; padding-left:12px; border-left:1px solid #3a3f4a;
+  }
+  .cmp .hint { margin-right:2px; }
   .problems label { margin-right:10px; font-size:13px; user-select:none; }
-  #comment { width:340px; }
+  #comment { width:280px; background:#2a2e36; color:#e8e8e8; border:1px solid #444; border-radius:4px; padding:4px 8px; }
   .hint { color:#888; font-size:12px; }
-  figcaption { color:#aaa; padding:4px; font-size:13px; }
+  figcaption { color:#aaa; padding:2px 0 0; font-size:13px; flex-shrink:0; }
+  #zoom {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:10;
+    align-items:center; justify-content:center; padding:16px; cursor:zoom-out; overflow:auto;
+  }
+  #zoom.show { display:flex; }
+  #zoom .zoom-box { position:relative; line-height:0; }
+  #zoom img { max-width:none; max-height:none; cursor:zoom-out; }
+  #zoom .zoom-box img.layer-b {
+    position:absolute; left:0; top:0; width:100%; height:100%; object-fit:fill; border:none;
+  }
 </style>
 </head>
 <body>
 <header>
-  <b>布局标注</b>
-  <label>标注人 <input id="annotator" placeholder="姓名/工号" size="10"></label>
-  <span id="progress"></span>
-  <button id="prev">上一条</button>
-  <button id="next">下一条</button>
-  <button id="export" class="primary">导出标注 (.jsonl)</button>
-  <span class="hint" id="hint"></span>
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <b>布局标注</b>
+      <a class="live" id="live" href="#" target="_blank" rel="noopener" hidden>对照官网投图</a>
+      <label>标注人 <input id="annotator" placeholder="姓名/工号" size="10"></label>
+      <span id="progress"></span>
+      <label class="filter"><input type="checkbox" id="onlyunlabeled"> 只看未标注</label>
+      <label class="filter" id="goldfilterwrap" hidden><input type="checkbox" id="onlygold"> 只看 gold</label>
+      <span class="hint" id="hint"></span>
+    </div>
+    <div class="toolbar-nav">
+      <button id="prev">上一条</button>
+      <button id="next">下一条</button>
+      <label class="jump">跳到 <input id="jump" type="number" min="1" step="1"> 条</label>
+      <button id="jumpgo">跳转</button>
+      <button id="export" class="primary">导出标注 (.jsonl)</button>
+    </div>
+  </div>
+  <div id="viewmeta"></div>
 </header>
-<div id="imgs"></div>
 <div id="panel"></div>
+<div id="imgs"></div>
+<div id="zoom"><div class="zoom-box" id="zoombox"></div></div>
 <script src="tasks.js"></script>
+<script src="auto_labels.js"></script>
+<script src="task_links.js"></script>
+<script src="gold_ids.js"></script>
+<script src="discards.js"></script>
 <script>
 const TASKS = window.TASKS || [];
 const DSID = window.DATASET_ID || "default";
+const GOLD = new Set(window.GOLD_IDS || []);
+const DROP_REASONS = [
+  ["weird", "怪异"],
+  ["too_simple", "过于简单"],
+  ["no_source", "无法对照"]
+];
 const PROBLEMS = [
   ["text_overlap","文字重叠"],["text_cross_line","文字穿线"],["out_of_frame","出框"],
   ["text_in_part","文字进零件"],["layer_disorder","分层乱序"],["leader_too_long","引线过长"],
   ["overcrowd","某侧过密"],["unbalanced","分布不均"]
 ];
-let idx = 0;
+function parseItemNo(raw){
+  const n = parseInt(String(raw || "").trim(), 10);
+  if (!Number.isFinite(n) || !TASKS.length) return 1;
+  return Math.min(Math.max(n, 1), TASKS.length);
+}
+function itemNoFromHash(){
+  const m = String(location.hash || "").match(/(\d+)/);
+  return m ? parseItemNo(m[1]) : 1;
+}
+let idx = itemNoFromHash() - 1;
 let labels = JSON.parse(localStorage.getItem("labels_"+DSID) || "{}");
+(function applyTaskLinks(){
+  const links = window.TASK_LINKS || {};
+  for (const t of TASKS) {
+    const extra = links[t.id];
+    if (!extra) continue;
+    for (const key of ["drawing_url","part_name","view_type","tenant_id","tree_uuid","annotation_note"]) {
+      if (extra[key] && !t[key]) t[key] = extra[key];
+    }
+  }
+})();
+(function applyColleagueLabelFlip(){
+  const ids = window.COLLEAGUE_LABEL_FLIP || [];
+  const flag = "colleague_ab_aligned_" + DSID;
+  if (!ids.length || localStorage.getItem(flag)) return;
+  for (const id of ids) {
+    const lab = labels[id];
+    if (!lab || !lab.prefer || lab.prefer === "tie") continue;
+    lab.prefer = lab.prefer === "a" ? "b" : "a";
+  }
+  localStorage.setItem("labels_" + DSID, JSON.stringify(labels));
+  localStorage.setItem(flag, "1");
+})();
+(function mergeAutoLabels(){
+  const AUTO = window.AUTO_LABELS || {};
+  let n = 0;
+  for (const id of Object.keys(AUTO)) {
+    const cur = labels[id];
+    const comment = cur && String(cur.comment || "");
+    if (cur && cur.discard) continue;
+    const human = cur && Number.isFinite(cur.grade) && !comment.startsWith("auto:");
+    if (human) continue;
+    labels[id] = {...AUTO[id]};
+    n++;
+  }
+  if (n) localStorage.setItem("labels_"+DSID, JSON.stringify(labels));
+})();
+(function mergeFileDiscards(){
+  const canned = window.DISCARDS || {};
+  let n = 0;
+  for (const id of Object.keys(canned)) {
+    const cur = labels[id];
+    if (cur && (cur.discard || cur.prefer || Number.isFinite(cur.grade))) continue;
+    const src = canned[id] && typeof canned[id] === "object" ? canned[id] : {};
+    labels[id] = {discard: true, discard_reason: src.reason || src.discard_reason || "other"};
+    n++;
+  }
+  if (n) localStorage.setItem("labels_"+DSID, JSON.stringify(labels));
+})();
 document.getElementById("annotator").value = localStorage.getItem("annotator_"+DSID) || "";
+let onlyUnlabeled = localStorage.getItem("filter_unlabeled_"+DSID) === "1";
+let onlyGold = localStorage.getItem("filter_gold_"+DSID) === "1";
+const onlyBox = document.getElementById("onlyunlabeled");
+onlyBox.checked = onlyUnlabeled;
+const goldWrap = document.getElementById("goldfilterwrap");
+const goldBox = document.getElementById("onlygold");
+if (GOLD.size) {
+  goldWrap.hidden = false;
+  goldBox.checked = onlyGold;
+} else {
+  onlyGold = false;
+}
 
-function save(){ localStorage.setItem("labels_"+DSID, JSON.stringify(labels));
-  localStorage.setItem("annotator_"+DSID, document.getElementById("annotator").value); render(); }
+const zoom = document.getElementById("zoom");
+const zoombox = document.getElementById("zoombox");
+let compareMode = localStorage.getItem("compare_mode_"+DSID) || "side";
+let blinkAuto = localStorage.getItem("blink_auto_"+DSID) === "1";
+let blinkShowB = false;
+let blinkTimer = null;
+let pairSrc = {a:"", b:"", capA:"A", capB:"B"};
+
+function openZoom(src){
+  zoombox.className = "zoom-box";
+  zoombox.innerHTML = `<img src="${src}" alt="">`;
+  zoom.classList.add("show");
+}
+function openZoomStack(mode, showB){
+  zoombox.className = "zoom-box mode-" + mode + (showB ? " show-b" : "");
+  zoombox.innerHTML = `<img class="layer-a" src="${pairSrc.a}" alt="A"><img class="layer-b" src="${pairSrc.b}" alt="B">`;
+  zoom.classList.add("show");
+}
+function closeZoom(){ zoom.classList.remove("show"); zoombox.innerHTML = ""; }
+zoom.onclick = closeZoom;
+
+function stopBlinkTimer(){
+  if (blinkTimer) { clearInterval(blinkTimer); blinkTimer = null; }
+}
+function setCompareMode(m){
+  compareMode = m;
+  localStorage.setItem("compare_mode_"+DSID, m);
+  blinkShowB = false;
+  stopBlinkTimer();
+  render();
+}
+
+function persist(){
+  localStorage.setItem("labels_"+DSID, JSON.stringify(labels));
+  localStorage.setItem("annotator_"+DSID, document.getElementById("annotator").value);
+}
+function save(){ persist(); render(); }
+
+function officialDrawingUrl(t){
+  if (t && t.drawing_url) return t.drawing_url;
+  const m = String((t && t.view_key) || "").match(/^(\d{10,})\//);
+  if (!m) return "";
+  const sid = m[1];
+  const tenant = String((t && t.tenant_id) || "");
+  if (tenant === "0" || sid === "2082016429787918336") {
+    return "https://drawing.designorder.cn/?solutionId=" + encodeURIComponent(sid) + "&tenantId=0";
+  }
+  return "https://v3.private.designorder.cn/drawing/?solutionId=" + encodeURIComponent(sid) + "&tenantId=" + encodeURIComponent(tenant || "250");
+}
+
+function viewTypeZh(t){
+  const m = {front:"主视", left:"左视", right:"右视", top:"俯视", bottom:"仰视", rear:"后视", back:"后视"};
+  const vt = String((t && t.view_type) || "");
+  return vt ? (m[vt] || vt) : "";
+}
+
+function copyBtn(id, text){
+  return `<button type="button" id="${id}">复制</button>`;
+}
+
+function bindCopy(id, value){
+  const b = document.getElementById(id);
+  if (!b) return;
+  b.onclick = () => {
+    navigator.clipboard.writeText(value).then(() => { b.textContent = "已复制"; });
+  };
+}
+
+function bindLive(t){
+  const live = document.getElementById("live");
+  const meta = document.getElementById("viewmeta");
+  const href = officialDrawingUrl(t);
+  const part = String((t && t.part_name) || "");
+  const treeUuid = String((t && t.tree_uuid) || "");
+  const vtype = viewTypeZh(t);
+  if (!href) {
+    live.hidden = true;
+    live.removeAttribute("href");
+  } else {
+    live.hidden = false;
+    live.href = href;
+    const zhongche = href.indexOf("private") >= 0;
+    live.title = zhongche
+      ? "中车方案：请先打开 SwitchHosts 中车，再用中车账号登录"
+      : "公有云方案：请关闭中车 SwitchHosts，用公有云账号登录";
+    live.textContent = zhongche ? "对照中车官网投图" : "对照公有云官网投图";
+  }
+  const note = String((t && t.annotation_note) || "");
+  const goldTag = GOLD.has(t && t.id) ? "gold " : "";
+  if (!part && !treeUuid) {
+    const bits = [];
+    if (goldTag) bits.push("gold");
+    if (href) bits.push("该条没有线上零件名，请在打开的方案里自己找对应视图");
+    else bits.push("无官网投图（合成/OSS 导出），建议删除");
+    if (note) bits.push(note);
+    meta.textContent = bits.join(" · ");
+    return;
+  }
+  const bits = [];
+  if (goldTag) bits.push("gold");
+  if (part) bits.push(`零件 <b>${part}</b> ${copyBtn("copypart")}`);
+  if (treeUuid) bits.push(`零件UUID <b>${treeUuid}</b> ${copyBtn("copytree")}`);
+  if (vtype) bits.push(vtype);
+  bits.push(`<span class="hint">左树搜索框粘贴零件名后回车；或输入 @${treeUuid || "零件UUID"} 后回车。选中后再在该零件的视图里找${vtype || "对应视图"}</span>`);
+  meta.innerHTML = bits.join(" · ");
+  if (part) bindCopy("copypart", part);
+  if (treeUuid) bindCopy("copytree", treeUuid);
+}
+
+function bindZoom(root){
+  root.querySelectorAll("img").forEach(img => {
+    img.onclick = () => openZoom(img.src);
+    img.title = "点击查看原图";
+  });
+}
+
+function compareCaption(){
+  if (compareMode === "blink")
+    return blinkShowB
+      ? "叠看 · 当前 B · 空格切换 / 按住空格看另一张"
+      : "叠看 · 当前 A · 空格切换 / 按住空格看另一张";
+  if (compareMode === "diff")
+    return "差异 · 黑色=相同，亮色=改动（文字错位会成品红/青块）";
+  if (compareMode === "wipe")
+    return "刮擦 · 在图上左右拖，左 A 右 B";
+  return "";
+}
+
+function bindCompareStack(stack){
+  const imgA = stack.querySelector(".layer-a");
+  const fit = () => {
+    const frame = stack.parentElement;
+    if (!frame || !imgA) return;
+    imgA.style.maxHeight = frame.clientHeight + "px";
+    imgA.style.maxWidth = frame.clientWidth + "px";
+  };
+  if (imgA.complete) fit(); else imgA.onload = fit;
+  window.removeEventListener("resize", window.__fitStack);
+  window.__fitStack = fit;
+  window.addEventListener("resize", fit);
+  let dragged = false;
+  const applyWipe = ev => {
+    const r = stack.getBoundingClientRect();
+    const x = Math.min(Math.max(ev.clientX - r.left, 0), r.width);
+    stack.style.setProperty("--wipe", (x / r.width * 100) + "%");
+  };
+  if (compareMode === "wipe") {
+    stack.addEventListener("pointerdown", ev => {
+      dragged = false;
+      stack.setPointerCapture(ev.pointerId);
+      applyWipe(ev);
+    });
+    stack.addEventListener("pointermove", ev => {
+      if (!ev.buttons) return;
+      dragged = true;
+      applyWipe(ev);
+    });
+  }
+  stack.addEventListener("click", ev => {
+    if (compareMode === "wipe" && dragged) { ev.preventDefault(); dragged = false; return; }
+    openZoomStack(compareMode, blinkShowB);
+  });
+  stack.title = compareMode === "wipe" ? "拖动分割线对比；点击看原图" : "点击查看原图";
+}
+
+function startBlinkAuto(){
+  stopBlinkTimer();
+  if (!blinkAuto || compareMode !== "blink") return;
+  blinkTimer = setInterval(() => {
+    blinkShowB = !blinkShowB;
+    const stack = document.getElementById("stack");
+    if (stack) stack.classList.toggle("show-b", blinkShowB);
+    const cap = document.getElementById("cmpcap");
+    if (cap) cap.textContent = compareCaption();
+  }, 320);
+}
+
+function setBlinkVisible(show){
+  blinkShowB = show;
+  const stack = document.getElementById("stack");
+  if (stack && compareMode === "blink") stack.classList.toggle("show-b", show);
+  const cap = document.getElementById("cmpcap");
+  if (cap && compareMode === "blink") cap.textContent = compareCaption();
+}
+
+function peekOther(on){
+  const t = TASKS[idx];
+  if (!t || t.type !== "prefer") return;
+  if (compareMode === "blink") {
+    if (!blinkAuto) setBlinkVisible(on);
+    return;
+  }
+  if (compareMode === "side") {
+    const imgA = document.querySelector("#imgs img[alt='A']");
+    const cap = document.querySelector("#imgs figure:first-child figcaption");
+    if (!imgA) return;
+    imgA.src = on ? pairSrc.b : pairSrc.a;
+    if (cap) cap.textContent = on ? pairSrc.capA + "（现为 B，松开空格还原）" : pairSrc.capA;
+  }
+}
+
+function renderPreferPair(t, srcA, srcB){
+  const capA = t.source === "colleague_pairs" ? "A 扰动" : "A";
+  const capB = t.source === "colleague_pairs" ? "B 完美" : "B";
+  pairSrc = {a: srcA, b: srcB, capA, capB};
+  const imgs = document.getElementById("imgs");
+  if (compareMode === "side") {
+    imgs.className = "";
+    imgs.innerHTML = `
+      <figure><div class="frame"><img src="${srcA}" alt="A"></div><figcaption>${capA}</figcaption></figure>
+      <figure><div class="frame"><img src="${srcB}" alt="B"></div><figcaption>${capB}</figcaption></figure>`;
+    bindZoom(imgs);
+    return;
+  }
+  imgs.className = "single";
+  const showB = compareMode === "blink" && blinkShowB ? " show-b" : "";
+  imgs.innerHTML = `
+    <figure>
+      <div class="frame">
+        <div class="stack-box mode-${compareMode}${showB}" id="stack">
+          <img class="layer-a" src="${srcA}" alt="A">
+          <img class="layer-b" src="${srcB}" alt="B">
+          ${compareMode === "wipe" ? '<div class="wipe-line"></div>' : ""}
+        </div>
+      </div>
+      <figcaption id="cmpcap">${compareCaption()}</figcaption>
+    </figure>`;
+  bindCompareStack(document.getElementById("stack"));
+  startBlinkAuto();
+}
+
+function compareToolbar(){
+  const btn = (m, label) =>
+    `<button type="button" data-cmp="${m}" class="${compareMode===m?'sel':''}">${label}</button>`;
+  return `<span class="cmp"><span class="hint">找差异</span>
+    ${btn("side","左右")}
+    ${btn("blink","叠看")}
+    ${btn("diff","差异")}
+    ${btn("wipe","刮擦")}
+    <label class="filter" ${compareMode==="blink"?"":"hidden"}><input type="checkbox" id="blinkauto"${blinkAuto?" checked":""}> 自动闪</label>
+  </span>`;
+}
+
+function isDiscarded(t){
+  const lab = labels[t && t.id];
+  return !!(lab && lab.discard);
+}
+function isLabeled(t){
+  const lab = labels[t && t.id];
+  if (!lab) return false;
+  if (lab.discard) return true;
+  if (t.type === "prefer") return !!lab.prefer;
+  return Number.isFinite(lab.grade);
+}
+function inFilter(i){
+  const t = TASKS[i];
+  if (!t) return false;
+  if (onlyGold && GOLD.size && !GOLD.has(t.id)) return false;
+  if (onlyUnlabeled && isLabeled(t)) return false;
+  return true;
+}
+function filteredIdx(){
+  return TASKS.map((t, i) => i).filter(inFilter);
+}
+function nearestFiltered(from, dir){
+  for (let i = from + dir; i >= 0 && i < TASKS.length; i += dir) {
+    if (inFilter(i)) return i;
+  }
+  return -1;
+}
+function ensureFilter(){
+  if (!TASKS.length) return true;
+  if (inFilter(idx)) return true;
+  const n = nearestFiltered(idx, 1);
+  if (n >= 0) { idx = n; return true; }
+  const p = nearestFiltered(idx, -1);
+  if (p >= 0) { idx = p; return true; }
+  return false;
+}
+function dropReasonLabel(code){
+  const hit = DROP_REASONS.find(row => row[0] === code);
+  return hit ? hit[1] : (code || "其他");
+}
+function dropTask(reason){
+  const t = TASKS[idx];
+  if (!t) return;
+  labels[t.id] = {discard: true, discard_reason: reason};
+  persist();
+  go(1);
+}
+function dropToolbar(lab){
+  const btns = DROP_REASONS.map(([code, zh]) =>
+    `<button type="button" class="drop ${lab.discard && lab.discard_reason===code ? "sel" : ""}" data-drop="${code}">删除·${zh}${code==="weird"?" (Q)":""}</button>`
+  ).join("");
+  const undo = lab.discard ? `<button type="button" id="undrop">撤销删除</button>` : "";
+  return `<span class="cmp"><span class="hint">剔除</span>${btns}${undo}</span>`;
+}
+function bindDrop(lab){
+  document.querySelectorAll("button[data-drop]").forEach(b => {
+    b.onclick = () => dropTask(b.dataset.drop);
+  });
+  const undo = document.getElementById("undrop");
+  if (undo) undo.onclick = () => {
+    const t = TASKS[idx];
+    if (!t) return;
+    delete labels[t.id];
+    persist();
+    render();
+  };
+}
+function renderEmptyUnlabeled(done, nDrop){
+  stopBlinkTimer();
+  document.getElementById("live").hidden = true;
+  document.getElementById("viewmeta").textContent = "";
+  document.getElementById("panel").innerHTML = "";
+  document.getElementById("imgs").innerHTML = "<p style='padding:40px'>没有符合筛选的任务</p>";
+  document.getElementById("progress").textContent = `筛到 0 · 已标 ${done} · 删除 ${nDrop}/${TASKS.length}`;
+  document.getElementById("hint").textContent = "取消「只看未标注 / 只看 gold」可回看全部条目";
+}
 
 function render(){
+  const nDrop = TASKS.filter(isDiscarded).length;
+  const done = TASKS.filter(isLabeled).length;
+  if (!ensureFilter()) { renderEmptyUnlabeled(done, nDrop); return; }
   const t = TASKS[idx];
   if (!t){ document.getElementById("imgs").innerHTML = "<p style='padding:40px'>没有任务</p>"; return; }
-  const done = Object.keys(labels).length;
-  document.getElementById("progress").textContent = `第 ${idx+1}/${TASKS.length} 条 · 已标 ${done}`;
+  bindLive(t);
+  const open = filteredIdx();
+  const pos = open.indexOf(idx) + 1;
+  document.getElementById("progress").textContent = (onlyUnlabeled || onlyGold)
+    ? `筛到第 ${pos}/${open.length} 条 · 全库 #${idx+1} · 已标 ${done - nDrop} · 删除 ${nDrop}`
+    : `第 ${idx+1}/${TASKS.length} 条 · 已标 ${done - nDrop} · 删除 ${nDrop}`;
+  const jump = document.getElementById("jump");
+  jump.min = 1;
+  jump.max = TASKS.length || 1;
+  if (document.activeElement !== jump) jump.value = String(idx + 1);
+  const hash = "#" + (idx + 1);
+  if (location.hash !== hash) history.replaceState(null, "", hash);
   const lab = labels[t.id] || {};
   const imgs = document.getElementById("imgs");
   const panel = document.getElementById("panel");
   if (t.type === "prefer"){
-    document.getElementById("hint").textContent = "快捷键: ← 选A · → 选B · T 差不多";
-    imgs.className = "";
-    imgs.innerHTML = `
-      <figure><img src="${t.render_a}"><figcaption>A</figcaption></figure>
-      <figure><img src="${t.render_b}"><figcaption>B</figcaption></figure>`;
+    document.getElementById("hint").textContent = lab.discard
+      ? `已删除（${dropReasonLabel(lab.discard_reason)}）· 可点撤销`
+      : t.source === "colleague_pairs"
+      ? "本条：A=扰动，B=完美（可直接标 B） · Q 删除·怪异 · 空格叠看"
+      : "快捷键: ←A →B ↑差不多 · Q 删除·怪异 · 空格叠看 · D 差异 · W 刮擦";
+    renderPreferPair(t, t.render_a, t.render_b);
     panel.innerHTML = `
       <button id="pa" class="${lab.prefer==='a'?'sel':''}">A 更好 (←)</button>
-      <button id="pt" class="${lab.prefer==='tie'?'sel':''}">差不多 (T)</button>
-      <button id="pb" class="${lab.prefer==='b'?'sel':''}">B 更好 (→)</button>`;
-    const set = v => { labels[t.id] = {prefer:v}; save(); go(1); };
+      <button id="pt" class="${lab.prefer==='tie'?'sel':''}">差不多 (↑)</button>
+      <button id="pb" class="${lab.prefer==='b'?'sel':''}">B 更好 (→)</button>
+      ${compareToolbar()}${dropToolbar(lab)}`;
+    const set = v => { labels[t.id] = {prefer:v}; persist(); go(1); };
     pa.onclick = ()=>set("a"); pb.onclick = ()=>set("b"); pt.onclick = ()=>set("tie");
+    panel.querySelectorAll("button[data-cmp]").forEach(b => {
+      b.onclick = () => setCompareMode(b.dataset.cmp);
+    });
+    bindDrop(lab);
+    const auto = document.getElementById("blinkauto");
+    if (auto) auto.onchange = () => {
+      blinkAuto = auto.checked;
+      localStorage.setItem("blink_auto_"+DSID, blinkAuto ? "1" : "0");
+      if (blinkAuto) startBlinkAuto(); else stopBlinkTimer();
+    };
   } else {
-    document.getElementById("hint").textContent = "快捷键: 1–5 打分（5=可直接出图, 1=不可用）";
+    document.getElementById("hint").textContent = lab.discard
+      ? `已删除（${dropReasonLabel(lab.discard_reason)}）· 可点撤销`
+      : (lab.comment || "").startsWith("auto:")
+      ? "本条已自动标注，请复核后按 1–5 确认（确认后不再被自动覆盖）· Q 删除·怪异"
+      : "快捷键: 1–5 打分（5=可直接出图, 1=不可用） · Q 删除·怪异";
     imgs.className = "single";
-    imgs.innerHTML = `<figure><img src="${t.render}"></figure>`;
+    imgs.innerHTML = `<figure><div class="frame"><img src="${t.render}" alt=""></div></figure>`;
     let btns = "";
     for (let g=1; g<=5; g++)
       btns += `<button data-g="${g}" class="${lab.grade===g?'sel':''}">${g}</button>`;
     let probs = PROBLEMS.map(([k,zh]) =>
       `<label><input type="checkbox" data-p="${k}" ${(lab.problems||[]).includes(k)?'checked':''}>${zh}</label>`).join("");
     panel.innerHTML = `等级：${btns} <span class="problems">${probs}</span>
-      <input id="comment" placeholder="备注(可选)" value="${lab.comment||''}">`;
+      <input id="comment" placeholder="备注(可选)" value="${lab.comment||''}">${dropToolbar(lab)}`;
     panel.querySelectorAll("button[data-g]").forEach(b => b.onclick = () => {
-      labels[t.id] = collect(parseInt(b.dataset.g)); save(); go(1);
+      labels[t.id] = collect(parseInt(b.dataset.g));
+      if (String(labels[t.id].comment || "").startsWith("auto:"))
+        labels[t.id].comment = "reviewed:" + String(labels[t.id].comment).slice(5);
+      persist(); go(1);
     });
     panel.querySelectorAll("input[data-p]").forEach(c => c.onchange = () => {
       labels[t.id] = collect((labels[t.id]||{}).grade); save();
@@ -94,23 +595,75 @@ function render(){
       const probs = [...panel.querySelectorAll("input[data-p]:checked")].map(c=>c.dataset.p);
       return {grade: g, problems: probs, comment: document.getElementById("comment").value};
     }
+    bindZoom(imgs);
+    bindDrop(lab);
   }
+  if (lab.discard) imgs.style.opacity = "0.45";
+  else imgs.style.opacity = "1";
 }
-function go(d){ idx = Math.min(Math.max(idx+d,0), TASKS.length-1); render(); }
+function go(d){
+  if (onlyUnlabeled || onlyGold) {
+    const n = nearestFiltered(idx, d);
+    if (n >= 0) idx = n;
+  } else {
+    idx = Math.min(Math.max(idx+d,0), TASKS.length-1);
+  }
+  blinkShowB = false;
+  stopBlinkTimer();
+  closeZoom();
+  render();
+}
+function jumpTo(raw){
+  if (!TASKS.length) return;
+  idx = parseItemNo(raw) - 1;
+  closeZoom();
+  render();
+}
+onlyBox.onchange = () => {
+  onlyUnlabeled = onlyBox.checked;
+  localStorage.setItem("filter_unlabeled_"+DSID, onlyUnlabeled ? "1" : "0");
+  closeZoom();
+  render();
+};
+if (GOLD.size) goldBox.onchange = () => {
+  onlyGold = goldBox.checked;
+  localStorage.setItem("filter_gold_"+DSID, onlyGold ? "1" : "0");
+  closeZoom();
+  render();
+};
 document.getElementById("prev").onclick = ()=>go(-1);
 document.getElementById("next").onclick = ()=>go(1);
+document.getElementById("jumpgo").onclick = ()=>jumpTo(document.getElementById("jump").value);
+document.getElementById("jump").addEventListener("keydown", e => {
+  if (e.key === "Enter"){ e.preventDefault(); jumpTo(e.target.value); }
+});
+window.addEventListener("hashchange", () => jumpTo(itemNoFromHash()));
 document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && zoom.classList.contains("show")){ closeZoom(); return; }
   const t = TASKS[idx]; if (!t) return;
-  if (e.target.tagName === "INPUT" && e.target.type === "text") return;
+  if (e.target.tagName === "INPUT") return;
   if (t.type === "prefer"){
-    if (e.key === "ArrowLeft"){ labels[t.id]={prefer:"a"}; save(); go(1); }
-    if (e.key === "ArrowRight"){ labels[t.id]={prefer:"b"}; save(); go(1); }
-    if (e.key.toLowerCase() === "t"){ labels[t.id]={prefer:"tie"}; save(); go(1); }
+    if (e.code === "Space"){ e.preventDefault(); if (!e.repeat) peekOther(true); return; }
+    if (e.key === "d" || e.key === "D"){ setCompareMode(compareMode === "diff" ? "side" : "diff"); return; }
+    if (e.key === "w" || e.key === "W"){ setCompareMode(compareMode === "wipe" ? "side" : "wipe"); return; }
+    if (e.key === "s" || e.key === "S"){ setCompareMode("side"); return; }
+    if (e.key === "q" || e.key === "Q"){ dropTask("weird"); return; }
+    if (e.key === "ArrowLeft"){ labels[t.id]={prefer:"a"}; persist(); go(1); }
+    if (e.key === "ArrowRight"){ labels[t.id]={prefer:"b"}; persist(); go(1); }
+    if (e.key === "ArrowUp"){ e.preventDefault(); labels[t.id]={prefer:"tie"}; persist(); go(1); }
+  } else if (e.key === "q" || e.key === "Q"){
+    dropTask("weird");
   } else if (["1","2","3","4","5"].includes(e.key)){
     const prev = labels[t.id]||{};
-    labels[t.id] = {grade:parseInt(e.key), problems:prev.problems||[], comment:prev.comment||""};
-    save(); go(1);
+    let comment = prev.comment||"";
+    if (comment.startsWith("auto:")) comment = "reviewed:" + comment.slice(5);
+    labels[t.id] = {grade:parseInt(e.key), problems:prev.problems||[], comment};
+    persist(); go(1);
   }
+});
+document.addEventListener("keyup", e => {
+  if (e.target.tagName === "INPUT") return;
+  if (e.code === "Space") peekOther(false);
 });
 document.getElementById("export").onclick = () => {
   const who = document.getElementById("annotator").value || "unknown";

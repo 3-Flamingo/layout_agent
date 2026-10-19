@@ -11,6 +11,7 @@ weight_decay: 1.0e-2
 freeze_stages: 2
 pretrained: false
 patience: 12
+eval_margin: 1.0e-6
 num_workers: 4
 seed: 7
 amp: bf16

@@ -19,6 +19,17 @@ OUT="${2:-runs/reward_a800}"
 # Default to bootstrap (safe for hundreds of pairs). Override with CONFIG=... for full a800_8x.yaml.
 CONFIG="${CONFIG:-src/layout_agent/training/configs/a800_8x_bootstrap.yaml}"
 NPROC="${NPROC_PER_NODE:-8}"
+if [[ -n "${TORCHRUN:-}" ]]; then
+  TORCHRUN_BIN="$TORCHRUN"
+elif [[ -x "${ROOT}/.venv/bin/torchrun" ]]; then
+  TORCHRUN_BIN="${ROOT}/.venv/bin/torchrun"
+else
+  TORCHRUN_BIN="$(command -v torchrun || true)"
+fi
+if [[ -z "$TORCHRUN_BIN" ]]; then
+  echo "torchrun not found; activate the training environment or set TORCHRUN=/path/to/torchrun" >&2
+  exit 127
+fi
 
 export NCCL_IB_DISABLE="${NCCL_IB_DISABLE:-0}"
 export NCCL_P2P_DISABLE="${NCCL_P2P_DISABLE:-0}"
@@ -29,9 +40,10 @@ echo "manifest=$MANIFEST"
 echo "out=$OUT"
 echo "config=$CONFIG"
 echo "nproc_per_node=$NPROC"
+echo "torchrun=$TORCHRUN_BIN"
 nvidia-smi -L || true
 
-torchrun --standalone --nproc_per_node="$NPROC" \
+"$TORCHRUN_BIN" --standalone --nproc_per_node="$NPROC" \
   -m layout_agent.training.train \
   --manifest "$MANIFEST" \
   --out "$OUT" \

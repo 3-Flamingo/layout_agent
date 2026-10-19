@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from PIL import Image, ImageChops, ImageDraw
 
+from layout_agent.cad_marks import roughness_world_geom
 from layout_agent.models import (
     ColorLegend,
     ColorLegendEntry,
@@ -77,7 +78,9 @@ class Perceiver:
         out_obstacle: Optional[Path] = None,
     ) -> LayoutState:
         """Re-render ICM from geometry (used after execute). Keeps color↔id binding."""
-        bbox = state.view.get("bbox") or {}
+        # Rendering may use a larger envelope than the immutable legal frame.
+        # Evaluator.view_frame intentionally ignores render_bbox.
+        bbox = state.view.get("render_bbox") or state.view.get("bbox") or {}
         bmin = bbox.get("min", {"x": 0, "y": 0})
         bmax = bbox.get("max", {"x": 100, "y": 80})
         pad = 5.0
@@ -173,6 +176,31 @@ class Perceiver:
                 2,
             )
             text_blob(Point(x=end.x, y=end.y), color, dia.id, tw, th)
+
+        # Roughness follows the part, not a layout instance — occupancy only.
+        obs_hex = self.obstacle_reserved[0] if self.obstacle_reserved else "ffffff"
+        for rg in getattr(state, "roughness", None) or []:
+            geom = roughness_world_geom(rg)
+            for poly in geom.polylines:
+                if len(poly) < 2:
+                    continue
+                pts = [Point(x=x, y=y) for x, y in poly]
+                pix = [world_to_pixel(p.x, p.y, origin, ps, height) for p in pts]
+                obs_draw.line(pix, fill=255, width=3)
+                draw.line(pix, fill=hex_to_rgb(obs_hex), width=2)
+            for cx, cy, r in geom.circles:
+                c0, r0 = world_to_pixel(cx - r, cy + r, origin, ps, height)
+                c1, r1 = world_to_pixel(cx + r, cy - r, origin, ps, height)
+                obs_draw.ellipse([c0, r0, c1, r1], outline=255, width=3)
+                draw.ellipse([c0, r0, c1, r1], outline=hex_to_rgb(obs_hex), width=2)
+            for tx, ty, content, _deg, th in geom.texts:
+                if not content:
+                    continue
+                tw = max(th * max(len(content), 1) * 0.6, th)
+                c0, r0 = world_to_pixel(tx - tw / 2, ty + th / 2, origin, ps, height)
+                c1, r1 = world_to_pixel(tx + tw / 2, ty - th / 2, origin, ps, height)
+                obs_draw.rectangle([c0, r0, c1, r1], fill=255)
+                draw.rectangle([c0, r0, c1, r1], fill=hex_to_rgb(obs_hex))
 
         # pixel conflicts from per-id masks (ICM composite alone cannot show overwrite collisions)
         ids = sorted(id_masks.keys())

@@ -10,8 +10,9 @@ T2 labels file (jsonl), one per line — paths relative to the manifest dir:
   {"pair_id": "...", "state_a": "...", "state_b": "...", "label": {"prefer": "a|b|tie"}}
 Both formats match the annotation tool export and pairs manifest.
 
-Score used: the service 0-100 composite (score_adapt.build_score_card) when
---service-root is importable, else fallback score = -P.
+Score used: unrounded ``score_adapt.ranking_key`` for forced-choice T2 (new
+human_pairs protocol has no 「差不多」). Display 0-100
+``build_score_card`` is kept for T1 and for ``--no-force-choice``. Fallback: -P.
 
 Usage:
   python scripts/evalset_baseline_consistency.py --t2 data/evalsys/pairs_perturb/manifest.jsonl
@@ -21,9 +22,12 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
+from collections import defaultdict
 from pathlib import Path
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -33,28 +37,80 @@ from layout_agent.config import load_config
 from layout_agent.evaluate import Evaluator
 from layout_agent.models import LayoutState
 from layout_agent.perceive import Perceiver
+from layout_agent.training.metrics import pairwise_agreement
 
 _SCORE_CARD = None
+_RANK_KEY = None
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _try_import_score_adapt(service_root: Path) -> None:
-    global _SCORE_CARD
+    global _SCORE_CARD, _RANK_KEY
     src = service_root / "src"
     if (src / "score_adapt.py").is_file():
         sys.path.insert(0, str(src))
         try:
-            from score_adapt import build_score_card  # noqa: PLC0415
+            from score_adapt import build_score_card, ranking_key  # noqa: PLC0415
 
             _SCORE_CARD = build_score_card
+            _RANK_KEY = ranking_key
             print(f"using service score_adapt from {src}")
         except Exception as e:  # noqa: BLE001
             print(f"score_adapt import failed ({e}); falling back to -P")
 
 
-def _score(report: Any) -> float:
-    if _SCORE_CARD is not None:
-        return float(_SCORE_CARD(report)["score"])
-    return -float(report.metrics.get("P", 0.0))
+@dataclass(frozen=True)
+class ScoredState:
+    display: float
+    rank: Tuple[float, ...]
+
+
+def _ann_spread(state: LayoutState) -> float:
+    """Mean distance of annotation poses from their centroid (smaller is tighter)."""
+    pts: List[Tuple[float, float]] = []
+    for lin in state.linears:
+        pt = lin.text_point or lin.point
+        pts.append((float(pt.x), float(pt.y)))
+    for rad in list(state.diameters) + list(state.radials):
+        if rad.path:
+            pts.append((float(rad.path[-1].x), float(rad.path[-1].y)))
+        else:
+            pts.append((float(rad.anchor.x), float(rad.anchor.y)))
+    if len(pts) < 2:
+        return 0.0
+    cx = sum(p[0] for p in pts) / len(pts)
+    cy = sum(p[1] for p in pts) / len(pts)
+    return sum(((p[0] - cx) ** 2 + (p[1] - cy) ** 2) ** 0.5 for p in pts) / len(pts)
+
+
+def _score_report(report: Any, state: Optional[LayoutState] = None) -> ScoredState:
+    p = -float(report.metrics.get("P", 0.0))
+    if _SCORE_CARD is None and _RANK_KEY is None:
+        extra = (-_ann_spread(state),) if state is not None else ()
+        return ScoredState(display=p, rank=(p,) + extra)
+    display = float(_SCORE_CARD(report)["score"]) if _SCORE_CARD is not None else p
+    rank = tuple(_RANK_KEY(report)) if _RANK_KEY is not None else (display,)
+    if state is not None:
+        rank = rank + (-_ann_spread(state),)
+    return ScoredState(display=display, rank=rank)
+
+
+def _resolve_state_path(rel: str, jsonl_path: Path) -> Path:
+    """Resolve state paths from either the jsonl directory or the repo root."""
+    p = Path(rel)
+    if p.is_absolute():
+        return p
+    for cand in (jsonl_path.parent / p, ROOT / p, p):
+        if cand.exists():
+            return cand
+    return jsonl_path.parent / p
 
 
 class StateScorer:
@@ -64,9 +120,9 @@ class StateScorer:
         self.evaluator = Evaluator(cfg)
         self.work = ROOT / "data" / "evalsys" / "_consistency_work"
         self.work.mkdir(parents=True, exist_ok=True)
-        self._cache: Dict[str, float] = {}
+        self._cache: Dict[str, ScoredState] = {}
 
-    def score_file(self, state_path: Path) -> Optional[float]:
+    def score_file(self, state_path: Path) -> Optional[ScoredState]:
         key = str(state_path.resolve())
         if key in self._cache:
             return self._cache[key]
@@ -83,13 +139,9 @@ class StateScorer:
                 obs_p = Path(obs) if Path(obs).is_absolute() else state_path.parent.parent / obs
                 if obs and obs_p.exists():
                     state.raster.obstacle_image = str(obs_p.resolve())
-            else:
-                sid = state.state_id or "v"
-                state = self.perceiver.render_icm(
-                    state, self.work / f"{sid}.instance.png", self.work / f"{sid}.obstacle.png"
-                )
+            # Geometry evaluate does not need ICM rasters; skip slow re-render.
             report = self.evaluator.evaluate(state)
-            val = _score(report)
+            val = _score_report(report, state)
         except Exception as e:  # noqa: BLE001
             print(f"score failed for {state_path.name}: {e}")
             val = None
@@ -134,16 +186,14 @@ def eval_t1(path: Path, scorer: StateScorer) -> Dict[str, Any]:
             if not line.strip():
                 continue
             item = json.loads(line)
-            sp = Path(item["state"])
-            if not sp.is_absolute():
-                sp = path.parent / sp
+            sp = _resolve_state_path(str(item["state"]), path)
             s = scorer.score_file(sp)
             if s is None:
                 continue
             g = int(item["label"]["grade"])
             grades.append(float(g))
-            scores.append(s)
-            per_grade.setdefault(g, []).append(s)
+            scores.append(s.display)
+            per_grade.setdefault(g, []).append(s.display)
     out = {
         "n": len(grades),
         "spearman": round(spearman(scores, grades), 4) if len(grades) >= 3 else None,
@@ -154,48 +204,59 @@ def eval_t1(path: Path, scorer: StateScorer) -> Dict[str, Any]:
     return out
 
 
-def eval_t2(path: Path, scorer: StateScorer, margin: float = 1e-6) -> Dict[str, Any]:
-    n = agree = disagree = model_tie = human_tie = 0
+def eval_t2(
+    path: Path,
+    scorer: StateScorer,
+    margin: float = 1e-6,
+    split: str = "",
+    *,
+    force_choice: bool = True,
+) -> Dict[str, Any]:
+    scored: List[Tuple[Any, Any, str]] = []
+    by_level: Dict[str, List[Tuple[Any, Any, str]]] = defaultdict(list)
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
             if not line.strip():
                 continue
             item = json.loads(line)
+            if split and item.get("split") != split:
+                continue
             prefer = str(item.get("label", {}).get("prefer", "")).lower()
             if prefer not in ("a", "b", "tie"):
                 continue
-            base = path.parent
-            sa = scorer.score_file(base / item["state_a"])
-            sb = scorer.score_file(base / item["state_b"])
+            sa = scorer.score_file(_resolve_state_path(str(item["state_a"]), path))
+            sb = scorer.score_file(_resolve_state_path(str(item["state_b"]), path))
             if sa is None or sb is None:
                 continue
-            n += 1
-            if prefer == "tie":
-                human_tie += 1
-                continue
-            if abs(sa - sb) <= margin:
-                model_tie += 1
-                continue
-            model_prefer = "a" if sa > sb else "b"
-            if model_prefer == prefer:
-                agree += 1
+            if force_choice:
+                row = (sa.rank, sb.rank, prefer)
             else:
-                disagree += 1
-    decided = agree + disagree
-    return {
-        "n": n,
-        "human_tie": human_tie,
-        "model_tie": model_tie,
-        "agree": agree,
-        "disagree": disagree,
-        "agreement_rate": round(agree / decided, 4) if decided else None,
+                row = (sa.display, sb.display, prefer)
+            scored.append(row)
+            level = str(item.get("level") or "")
+            if level:
+                by_level[level].append(row)
+    out: Dict[str, Any] = {
+        "overall": pairwise_agreement(scored, margin, force_choice=force_choice),
+        "decision_protocol": "forced_choice" if force_choice else "margin_tie",
     }
+    for level, rows in sorted(by_level.items()):
+        out[level] = pairwise_agreement(rows, margin, force_choice=force_choice)
+    return out
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--t1", help="T1 labels jsonl (grades)")
     ap.add_argument("--t2", help="T2 labels jsonl (preferences) or pairs manifest.jsonl")
+    ap.add_argument("--split", default="", help="T2 split to evaluate, e.g. val or challenge")
+    ap.add_argument("--margin", type=float, default=1e-6, help="absolute score difference treated as a tie")
+    ap.add_argument(
+        "--force-choice",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="pick a side whenever scores differ (new human_pairs protocol; no 「差不多」)",
+    )
     ap.add_argument("--service-root", default=str(ROOT.parent / "service_ai_layout_agent"))
     ap.add_argument("--out", help="write report json here")
     args = ap.parse_args()
@@ -204,11 +265,39 @@ def main() -> None:
 
     _try_import_score_adapt(Path(args.service_root))
     scorer = StateScorer()
-    report: Dict[str, Any] = {"score_source": "score_adapt" if _SCORE_CARD else "-P"}
+    if args.force_choice and _RANK_KEY is not None:
+        score_source = "score_adapt.ranking_key"
+    elif _SCORE_CARD is not None:
+        score_source = "score_adapt"
+    else:
+        score_source = "-P"
+    report: Dict[str, Any] = {
+        "score_source": score_source,
+        "decision_protocol": "forced_choice" if args.force_choice else "margin_tie",
+        "inputs": {},
+    }
+    if args.split:
+        report["split"] = args.split
     if args.t1:
-        report["t1"] = eval_t1(Path(args.t1), scorer)
+        t1_path = Path(args.t1)
+        report["inputs"]["t1"] = {
+            "path": str(t1_path.resolve()),
+            "sha256": _sha256(t1_path),
+        }
+        report["t1"] = eval_t1(t1_path, scorer)
     if args.t2:
-        report["t2"] = eval_t2(Path(args.t2), scorer)
+        t2_path = Path(args.t2)
+        report["inputs"]["t2"] = {
+            "path": str(t2_path.resolve()),
+            "sha256": _sha256(t2_path),
+        }
+        report["t2"] = eval_t2(
+            t2_path,
+            scorer,
+            args.margin,
+            args.split,
+            force_choice=args.force_choice,
+        )
     print(json.dumps(report, ensure_ascii=False, indent=2))
     if args.out:
         Path(args.out).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")

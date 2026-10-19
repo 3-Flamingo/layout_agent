@@ -50,6 +50,10 @@ DEFAULTS: Dict[str, Any] = {
     "persistent_workers": True,
     "prefetch_factor": 2,
     "find_unused_parameters": False,
+    "eval_margin": 1.0e-6,
+    "formula_residual": False,
+    "residual_l2": 0.02,
+    "feat_dim": 0,
 }
 
 
@@ -57,7 +61,13 @@ def _collate(batch):
     pos = torch.from_numpy(np.stack([b["pos"] for b in batch]))
     neg = torch.from_numpy(np.stack([b["neg"] for b in batch]))
     levels = [b["level"] for b in batch]
-    return pos, neg, levels
+    if "pos_feat" in batch[0]:
+        pos_feat = torch.from_numpy(np.stack([b["pos_feat"] for b in batch]))
+        neg_feat = torch.from_numpy(np.stack([b["neg_feat"] for b in batch]))
+        pos_fs = torch.tensor([float(b["pos_formula"]) for b in batch], dtype=torch.float32)
+        neg_fs = torch.tensor([float(b["neg_formula"]) for b in batch], dtype=torch.float32)
+        return pos, neg, pos_feat, neg_feat, pos_fs, neg_fs, levels
+    return pos, neg, None, None, None, None, levels
 
 
 def _dist_info() -> tuple[bool, int, int, int]:
@@ -99,17 +109,42 @@ def _amp_dtype(name: str) -> Optional[torch.dtype]:
     return None
 
 
+def _forward_pair(model, pos, neg, pos_feat, neg_feat, pos_fs, neg_fs, device, amp_dtype):
+    pos = pos.to(device, non_blocking=True)
+    neg = neg.to(device, non_blocking=True)
+    x = torch.cat([pos, neg], dim=0)
+    feats = None
+    formula = None
+    if pos_feat is not None:
+        feats = torch.cat(
+            [pos_feat.to(device, non_blocking=True), neg_feat.to(device, non_blocking=True)],
+            dim=0,
+        )
+        formula = torch.cat(
+            [pos_fs.to(device, non_blocking=True), neg_fs.to(device, non_blocking=True)],
+            dim=0,
+        )
+    with torch.amp.autocast(device.type, enabled=amp_dtype is not None, dtype=amp_dtype or torch.float16):
+        s = model(x, feats, formula)
+    return s[: pos.size(0)], s[pos.size(0) :], formula
+
+
 @torch.no_grad()
-def validate(model, loader, device, amp_dtype: Optional[torch.dtype]) -> Dict[str, Any]:
+def validate(
+    model,
+    loader,
+    device,
+    amp_dtype: Optional[torch.dtype],
+    margin: float,
+) -> Dict[str, Any]:
     model.eval()
     correct = defaultdict(int)
     total = defaultdict(int)
-    for pos, neg, levels in loader:
-        x = torch.cat([pos, neg]).to(device, non_blocking=True)
-        with torch.amp.autocast(device.type, enabled=amp_dtype is not None, dtype=amp_dtype or torch.float16):
-            s = _unwrap(model)(x)
-        sp, sn = s[: len(pos)], s[len(pos) :]
-        ok = (sp > sn).detach().float().cpu().numpy()
+    for pos, neg, pos_feat, neg_feat, pos_fs, neg_fs, levels in loader:
+        sp, sn, _ = _forward_pair(
+            _unwrap(model), pos, neg, pos_feat, neg_feat, pos_fs, neg_fs, device, amp_dtype
+        )
+        ok = ((sp - sn) > margin).detach().float().cpu().numpy()
         for o, lv in zip(ok, levels):
             total["all"] += 1
             total[lv or "?"] += 1
@@ -155,6 +190,11 @@ def main() -> None:
         v = getattr(args, k)
         if v is not None:
             cfg[k] = v
+    if cfg.get("formula_residual"):
+        from layout_agent.training.formula_features import FORMULA_FEAT_DIM
+
+        cfg["feat_dim"] = int(FORMULA_FEAT_DIM)
+        cfg["channels"] = max(int(cfg.get("channels", 5)), 5)
 
     # device
     if distributed and torch.cuda.is_available():
@@ -187,10 +227,21 @@ def main() -> None:
         (out / "config.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
     manifest = Path(args.manifest)
+    if cfg.get("formula_residual") and _is_main(rank):
+        from layout_agent.training.formula_features import precompute_manifest_formula
+
+        precompute_manifest_formula(manifest)
+    if distributed:
+        dist.barrier()
     # cache only when single-process DataLoader (multi-worker duplicates RAM)
     use_cache = int(cfg["num_workers"]) == 0
-    ds_tr = PairDataset(manifest, "train", cfg["img_size"], cfg["channels"], cache=use_cache)
-    ds_va = PairDataset(manifest, "val", cfg["img_size"], cfg["channels"], cache=use_cache)
+    with_formula = bool(cfg.get("formula_residual"))
+    ds_tr = PairDataset(
+        manifest, "train", cfg["img_size"], cfg["channels"], cache=use_cache, with_formula=with_formula
+    )
+    ds_va = PairDataset(
+        manifest, "val", cfg["img_size"], cfg["channels"], cache=use_cache, with_formula=with_formula
+    )
 
     train_sampler: Optional[DistributedSampler] = None
     if distributed:
@@ -220,14 +271,25 @@ def main() -> None:
         dl_va = DataLoader(ds_va, shuffle=False, **loader_kw)
 
     if _is_main(rank):
+        from layout_agent.evalset.isolation import forbidden_training_views
+
+        blocked = forbidden_training_views(Path(__file__).resolve().parents[3])
+        leaked = [
+            rec.get("view_key")
+            for rec in list(ds_tr.records) + list(ds_va.records)
+            if rec.get("view_key") in blocked
+        ]
+        if leaked:
+            raise SystemExit(f"refusing to train on forbidden view_keys: {leaked[:8]}")
         print(
             f"train pairs: {len(ds_tr)}, val pairs: {len(ds_va)}, "
             f"device: {device}, world_size: {world_size}, "
             f"batch/gpu: {cfg['batch_size']}, global_batch: {int(cfg['batch_size']) * world_size}, "
-            f"amp: {cfg['amp']}"
+            f"amp: {cfg['amp']}, eval_margin: {cfg['eval_margin']}, "
+            f"formula_residual: {cfg.get('formula_residual')}, feat_dim: {cfg.get('feat_dim', 0)}"
         )
 
-    model = RewardModel(cfg["channels"], cfg["freeze_stages"], cfg["pretrained"]).to(device)
+    model = RewardModel.from_cfg(cfg).to(device)
     if distributed:
         model = DDP(
             model,
@@ -262,13 +324,16 @@ def main() -> None:
         model.train()
         t0 = time.perf_counter()
         losses = []
-        for pos, neg, _ in dl_tr:
-            pos = pos.to(device, non_blocking=True)
-            neg = neg.to(device, non_blocking=True)
-            x = torch.cat([pos, neg], dim=0)
-            with torch.amp.autocast(device.type, enabled=amp_dtype is not None, dtype=amp_dtype or torch.float16):
-                s = model(x)
-                loss = bt_loss(s[: pos.size(0)], s[pos.size(0) :])
+        l2w = float(cfg.get("residual_l2", 0.0) or 0.0)
+        for pos, neg, pos_feat, neg_feat, pos_fs, neg_fs, _ in dl_tr:
+            sp, sn, formula = _forward_pair(
+                model, pos, neg, pos_feat, neg_feat, pos_fs, neg_fs, device, amp_dtype
+            )
+            loss = bt_loss(sp, sn)
+            if l2w > 0 and formula is not None:
+                rp = sp - formula[: pos.size(0)]
+                rn = sn - formula[pos.size(0) :]
+                loss = loss + l2w * (rp.pow(2).mean() + rn.pow(2).mean())
             optim.zero_grad(set_to_none=True)
             if use_scaler:
                 scaler.scale(loss).backward()
@@ -289,7 +354,13 @@ def main() -> None:
 
         val = {"all": 0.0}
         if _is_main(rank) and dl_va is not None:
-            val = validate(model, dl_va, device, amp_dtype)
+            val = validate(
+                model,
+                dl_va,
+                device,
+                amp_dtype,
+                float(cfg["eval_margin"]),
+            )
 
         dt = time.perf_counter() - t0
         if _is_main(rank):
@@ -323,7 +394,10 @@ def main() -> None:
             break
 
     if _is_main(rank):
-        print(f"done. best val agreement: {best_acc:.4f} (epoch {best_epoch}) -> {out / 'best.pt'}")
+        print(
+            f"done. best val strict accuracy: {best_acc:.4f} "
+            f"(epoch {best_epoch}) -> {out / 'best.pt'}"
+        )
 
     _cleanup_dist()
 

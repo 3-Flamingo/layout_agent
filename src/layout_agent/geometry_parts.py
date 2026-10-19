@@ -235,7 +235,9 @@ def collect_parts(state: LayoutState) -> Dict[str, AnnoParts]:
 
 
 def view_frame(state: LayoutState, pad: float = 5.0) -> AABB:
-    bbox = state.view.get("bbox") or {}
+    # ``legal_bbox`` is immutable during an RL episode. ``render_bbox`` may
+    # grow so moved annotations remain visible, but must never relax H_OOB.
+    bbox = state.view.get("legal_bbox") or state.view.get("bbox") or {}
     bmin = bbox.get("min", {"x": 0, "y": 0})
     bmax = bbox.get("max", {"x": 100, "y": 80})
     return AABB(
@@ -335,6 +337,39 @@ def iter_obstacle_segments(state: LayoutState) -> Iterable[Tuple[str, Segment]]:
             ]
             for i in range(4):
                 yield ob.id, Segment(corners[i], corners[(i + 1) % 4])
+    if state.roughness:
+        import math
+
+        from layout_agent.cad_marks import roughness_world_geom
+
+        for mark in state.roughness:
+            obstacle_id = f"roughness:{mark.id}"
+            geom = roughness_world_geom(mark)
+            for polyline in geom.polylines:
+                points = [Point(x=x, y=y) for x, y in polyline]
+                for index in range(len(points) - 1):
+                    yield obstacle_id, Segment(points[index], points[index + 1])
+            for cx, cy, radius in geom.circles:
+                points = [
+                    Point(
+                        x=cx + radius * math.cos(2.0 * math.pi * index / 12.0),
+                        y=cy + radius * math.sin(2.0 * math.pi * index / 12.0),
+                    )
+                    for index in range(12)
+                ]
+                for index in range(12):
+                    yield obstacle_id, Segment(points[index], points[(index + 1) % 12])
+            for tx, ty, content, _rotation, height in geom.texts:
+                half_width = max(len(content), 1) * height * 0.31
+                half_height = height * 0.55
+                corners = [
+                    Point(x=tx - half_width, y=ty - half_height),
+                    Point(x=tx + half_width, y=ty - half_height),
+                    Point(x=tx + half_width, y=ty + half_height),
+                    Point(x=tx - half_width, y=ty + half_height),
+                ]
+                for index in range(4):
+                    yield obstacle_id, Segment(corners[index], corners[(index + 1) % 4])
 
 
 def text_crosses_obstacle(text: AABB, state: LayoutState) -> Optional[str]:

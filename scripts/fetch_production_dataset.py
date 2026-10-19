@@ -27,6 +27,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from layout_agent.config import load_config
+from layout_agent.cad_marks import (
+    attach_tolerance,
+    is_roughness_block,
+    roughness_extent,
+    roughness_value_from_block,
+)
 from layout_agent.models import (
     ColorLegend,
     ColorLegendEntry,
@@ -36,6 +42,7 @@ from layout_agent.models import (
     Point,
     RadialAnno,
     RasterMeta,
+    RoughnessAnno,
 )
 from layout_agent.perceive import ACTIVE_PALETTE, Perceiver
 
@@ -133,7 +140,7 @@ def load_json_file(path: Path) -> Dict[str, Any]:
 def download_oss_json(oss_prefix: str, key: str, dest: Path) -> Dict[str, Any]:
     dest.parent.mkdir(parents=True, exist_ok=True)
     url = f"{oss_prefix.rstrip('/')}/{key.lstrip('/')}?t={int(datetime.now().timestamp()*1000)}"
-    with httpx.Client(timeout=120.0) as client:
+    with httpx.Client(timeout=300.0) as client:
         resp = client.get(url)
     resp.raise_for_status()
     dest.write_bytes(resp.content)
@@ -211,7 +218,8 @@ def estimate_text(override: Dict[str, Any], content: str, dim_scale: float = 1.0
     scale = max(float(dim_scale or 1.0), 1e-6)
     th = dimtxt * scale
     width = max(th * 1.2, len(content) * th * 0.55)
-    return {"content": content, "width": width, "height": th * 1.15, "dimtxt": dimtxt, "dim_scale": scale}
+    text = {"content": content, "width": width, "height": th * 1.15, "dimtxt": dimtxt, "dim_scale": scale}
+    return attach_tolerance(text, override, scale)
 
 
 def aligned_measurement(
@@ -229,8 +237,10 @@ def aligned_measurement(
     not the Euclidean edge length. E.g. slanted edge with dimAngle=0 → |Δx|, dimAngle=90 → |Δy|.
     """
     if dim_angle_deg is None:
-        # fallback: direction of measured edge
-        ang = math.atan2(p2.y - p1.y, p2.x - p1.x)
+        # CAD default dimAngle is 0° (horizontal dim line). Do not fall back to
+        # the feature-edge direction — that yields the slant length (e.g. 85.09 /
+        # 84.14) instead of the displayed projection (85 / 4.75).
+        ang = 0.0
     else:
         ang = math.radians(float(dim_angle_deg))
     ux, uy = math.cos(ang), math.sin(ang)
@@ -248,6 +258,34 @@ def aligned_measurement(
 def format_dim_value(value: float, dimdec: int = 2) -> str:
     dec = max(0, int(dimdec))
     return f"{value:.{dec}f}".rstrip("0").rstrip(".")
+
+
+def convert_roughness_block(el: Dict[str, Any], view_matrix: Any) -> Optional[RoughnessAnno]:
+    if not is_roughness_block(el) or el.get("inVisibleFlag"):
+        return None
+    args = el.get("args") if isinstance(el.get("args"), dict) else {}
+    insert = _to_view_local(_apply_mat(_v2(el.get("insertPt")), el.get("matrix")), view_matrix)
+    try:
+        style = int(args.get("roughnessStyle") or 1)
+    except (TypeError, ValueError):
+        style = 1
+    try:
+        rot = float(el.get("rotation") or 0.0)
+    except (TypeError, ValueError):
+        rot = 0.0
+    uid = str(el.get("uuid") or f"RG_{_eid(el.get('id'))}")
+    return RoughnessAnno(
+        id=uid,
+        insert=insert,
+        rotation=rot,
+        scale=float(el.get("scale") or 1.0),
+        roughness_scale=float(args.get("roughnessScale") or 1.0),
+        value=roughness_value_from_block(el),
+        style=style,
+        text_height=float(args.get("textHeight") or 2.5),
+        triangle_side=float(args.get("triangleSideLength") or 2.89),
+        prefix=str(args.get("roughnessTextPrefix") or "Rz"),
+    )
 
 
 def convert_view(
@@ -294,9 +332,10 @@ def convert_view(
         text_ov = ov.get("text") if isinstance(ov.get("text"), dict) else {}
         dim_angle = el.get("dimAngle")
         try:
-            dim_angle_f = float(dim_angle) if dim_angle is not None else None
+            # CAD always has dimAngle; 0 = horizontal. Missing → 0, never "along edge".
+            dim_angle_f = float(dim_angle) if dim_angle is not None else 0.0
         except (TypeError, ValueError):
-            dim_angle_f = None
+            dim_angle_f = 0.0
         dim_scale = float(el.get("dimScale") or view.get("scale") or 1.0)
         parent_scale = 1.0
         # matrix scale * view.ref.scale (drawing-2d elementToDimParam)
@@ -309,9 +348,14 @@ def convert_view(
         vref = (view.get("ref") or {}) if isinstance(view.get("ref"), dict) else {}
         if vref.get("scale"):
             parent_scale *= float(vref["scale"])
+        # Measure in CAD local coords (xLine + dimAngle), matching CadAlignedDimensionUtil.
+        x1, y1 = _v2(el.get("xLine1Point"))
+        x2, y2 = _v2(el.get("xLine2Point"))
+        raw_p1 = Point(x=x1, y=y1)
+        raw_p2 = Point(x=x2, y=y2)
         value = aligned_measurement(
-            p1,
-            p2,
+            raw_p1,
+            raw_p2,
             dim_angle_f,
             measurement_type=str(el.get("measurementType") or "world"),
             parent_scale=parent_scale,
@@ -350,10 +394,18 @@ def convert_view(
         anchor = _to_view_local((cx, cy), vmat)
         end = _to_view_local(text_s, vmat)
         mid = Point(x=(anchor.x + end.x) / 2, y=(anchor.y + end.y) / 2)
+        ov = el.get("override") or {}
         hole = el.get("relatedHoleDetailedInfo") or {}
         diam = hole.get("diameter_value")
-        prefix = ((el.get("override") or {}).get("primaryUnit") or {}).get("dimPrefix") or "⌀"
-        content = f"{prefix}{diam}" if diam is not None else "⌀"
+        pu = ov.get("primaryUnit") if isinstance(ov.get("primaryUnit"), dict) else {}
+        prefix = pu.get("dimPrefix") or "⌀"
+        suffix = pu.get("dimSuffix") or ""
+        text_ov = ov.get("text") if isinstance(ov.get("text"), dict) else {}
+        dimdec = int(text_ov.get("dimdec") if text_ov.get("dimdec") is not None else 2)
+        if diam is not None:
+            content = f"{prefix}{format_dim_value(float(diam), dimdec)}{suffix}"
+        else:
+            content = f"{prefix}{suffix}" if (prefix or suffix) else "⌀"
         color = next_color()
         uid = str(el.get("uuid") or f"D_{_eid(el.get('id'))}")
         dim_scale = float(el.get("dimScale") or view.get("scale") or 1.0)
@@ -378,8 +430,16 @@ def convert_view(
         anchor = _to_view_local(center_s, vmat)
         end = _to_view_local(text_s, vmat)
         via = _to_view_local(chord_s, vmat)
-        prefix = ((el.get("override") or {}).get("primaryUnit") or {}).get("dimPrefix") or "R"
-        content = str(prefix)
+        ov = el.get("override") or {}
+        text_ov = ov.get("text") if isinstance(ov.get("text"), dict) else {}
+        pu = ov.get("primaryUnit") if isinstance(ov.get("primaryUnit"), dict) else {}
+        prefix = pu.get("dimPrefix") or "R"
+        suffix = pu.get("dimSuffix") or ""
+        cx, cy = _v2(el.get("center"))
+        hx, hy = _v2(el.get("chordPoint"))
+        radius = math.hypot(hx - cx, hy - cy)
+        dimdec = int(text_ov.get("dimdec") if text_ov.get("dimdec") is not None else 2)
+        content = f"{prefix}{format_dim_value(radius, dimdec)}{suffix}"
         color = next_color()
         uid = str(el.get("uuid") or f"R_{_eid(el.get('id'))}")
         dim_scale = float(el.get("dimScale") or view.get("scale") or 1.0)
@@ -437,6 +497,14 @@ def convert_view(
         radials.append(anno)
         legend.entries[color] = ColorLegendEntry(id=uid, category="chamfer")
 
+    roughness: List[RoughnessAnno] = []
+    for el in by_ctor.get("CadUserBlock", []):
+        if el.get("pid") != view_id:
+            continue
+        rg = convert_roughness_block(el, vmat)
+        if rg is not None:
+            roughness.append(rg)
+
     if not linears and not diameters and not radials:
         return None
 
@@ -474,6 +542,10 @@ def convert_view(
                 end = a.path[-1]
                 cx, cy = end.x, end.y
             _expand_text(cx, cy, tw, th)
+    for rg in roughness:
+        rx0, ry0, rx1, ry1 = roughness_extent(rg)
+        xs.extend([rx0, rx1])
+        ys.extend([ry0, ry1])
 
     pad = 15.0
     bbox_min = Point(x=min(xs) - pad, y=min(ys) - pad)
@@ -522,6 +594,7 @@ def convert_view(
             "linear_count": len(linears),
             "diameter_count": len(diameters),
             "radial_count": len(radials),
+            "roughness_count": len(roughness),
             "obstacle_count": len(obstacles),
         },
         view={"bbox": {"min": bbox_min.model_dump(), "max": bbox_max.model_dump()}},
@@ -537,6 +610,7 @@ def convert_view(
         linears=linears,
         diameters=diameters,
         radials=radials,
+        roughness=roughness,
         linear_groups=[
             {
                 "group_id": "default_linear",
@@ -734,11 +808,23 @@ def main() -> None:
 
     snap = out_root / "snapshots"
     snap.mkdir(parents=True, exist_ok=True)
-    # use slightly finer pixels for real drawings
-    cfg.setdefault("perceive", {})["pixel_size"] = float(cfg.get("perceive", {}).get("pixel_size", 0.35))
+    # use slightly finer pixels for real drawings; cap so huge sheets don't OOM
+    base_ps = float(cfg.get("perceive", {}).get("pixel_size", 0.35))
+    cfg.setdefault("perceive", {})["pixel_size"] = base_ps
     perceiver = Perceiver(cfg)
     # expand palette if needed by cycling
     palette = ACTIVE_PALETTE * 20
+
+    def _adaptive_ps(st: LayoutState, max_px: int = 2048) -> float:
+        bbox = st.view.get("bbox") or {}
+        bmin = bbox.get("min", {"x": 0, "y": 0})
+        bmax = bbox.get("max", {"x": 100, "y": 80})
+        span = max(
+            float(bmax["x"]) - float(bmin["x"]),
+            float(bmax["y"]) - float(bmin["y"]),
+            1e-6,
+        )
+        return max(base_ps, span / max_px)
 
     manifest_items = []
     for n_dims, view, part_no in selected:
@@ -746,7 +832,11 @@ def main() -> None:
             solution_meta["_part_number"] = part_no
         elif not part_list:
             solution_meta.pop("_part_number", None)
-        state = convert_view(view, by_ctor, solution_meta, palette)
+        try:
+            state = convert_view(view, by_ctor, solution_meta, palette)
+        except Exception as e:  # noqa: BLE001
+            print(f"  skip view {view.get('uuid')}: convert failed {e}")
+            continue
         if state is None:
             continue
         if args.id_suffix:
@@ -760,7 +850,16 @@ def main() -> None:
         rel_state = f"snapshots/{case_id}.state.json"
         rel_legend = f"snapshots/{case_id}.legend.json"
 
-        state = perceiver.render_icm(state, out_root / rel_inst, out_root / rel_obs)
+        perceiver.pixel_size = _adaptive_ps(state)
+        try:
+            state = perceiver.render_icm(state, out_root / rel_inst, out_root / rel_obs)
+        except MemoryError:
+            perceiver.pixel_size = _adaptive_ps(state, max_px=1024)
+            try:
+                state = perceiver.render_icm(state, out_root / rel_inst, out_root / rel_obs)
+            except MemoryError:
+                print(f"  skip view {view.get('uuid')}: ICM MemoryError")
+                continue
         state.raster.instance_image = rel_inst
         state.raster.obstacle_image = rel_obs
 

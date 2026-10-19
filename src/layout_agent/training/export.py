@@ -25,9 +25,11 @@ for _stream in (sys.stdout, sys.stderr):
 def export_onnx(ckpt_path: Path, out_path: Path, opset: int = 18) -> Path:
     ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
     cfg = ckpt["cfg"]
-    model = RewardModel(cfg["channels"], 0, False)
+    model = RewardModel.from_cfg(cfg, pretrained=False, freeze_stages=0)
     model.load_state_dict(strip_ddp_prefix(ckpt["model"]))
     model.eval()
+    if int(cfg.get("feat_dim", 0)) > 0:
+        raise SystemExit("formula-residual checkpoints need formula features; skip ONNX export")
 
     dummy = torch.zeros(1, cfg["channels"], cfg["img_size"], cfg["img_size"])
     out_path.parent.mkdir(parents=True, exist_ok=True)

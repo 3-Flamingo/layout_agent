@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>模仿学习在学什么</title>
+<style>
+  :root {
+    --ink: #1c2430;
+    --muted: #5c6b7a;
+    --line: #d5dde6;
+    --paper: #f4f7fb;
+    --card: #ffffff;
+    --expert: #c4504a;
+    --net: #2f6fbb;
+    --ok: #2e7d4f;
+    --dim: #1f8a4c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    padding: 22px 32px 8px;
+  }
+  h1 { margin: 0; font-size: 22px; font-weight: 650; }
+  #caption { margin: 8px 0 0; font-size: 16px; line-height: 1.55; min-height: 52px; }
+  #caption b { color: var(--expert); }
+  .controls { display: flex; gap: 8px; align-items: center; }
+  button {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font: inherit;
+    cursor: pointer;
+  }
+  button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  #stage {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 18px;
+    padding: 8px 32px 28px;
+    align-items: start;
+  }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px 16px;
+  }
+  .panel h2 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  svg { width: 100%; height: auto; display: block; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; color: var(--muted); font-weight: 600; font-size: 12px; padding: 0 8px 8px; }
+  td { padding: 8px; border-top: 1px solid var(--line); vertical-align: middle; }
+  tr.pick td { background: #fdeceb; }
+  tr.pred td { box-shadow: inset 3px 0 0 var(--net); }
+  .bar {
+    height: 8px;
+    border-radius: 4px;
+    background: #e6edf5;
+    overflow: hidden;
+  }
+  .bar > span {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: var(--net);
+    transition: width 0.7s ease;
+  }
+  tr.pick .bar > span { background: var(--expert); }
+  .tag {
+    display: inline-block;
+    min-width: 18px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  #foot {
+    padding: 0 32px 24px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .dim-label { font: 13px "Microsoft YaHei", sans-serif; fill: var(--dim); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>模仿学习在学什么</h1>
+    <p id="caption"></p>
+  </div>
+  <div class="controls">
+    <button id="prev" type="button">上一步</button>
+    <button id="play" type="button" class="active">暂停</button>
+    <button id="next" type="button">下一步</button>
+  </div>
+</header>
+<div id="stage">
+  <section class="panel">
+    <h2>当前图</h2>
+    <svg id="sheet" viewBox="0 0 360 250"></svg>
+  </section>
+  <section class="panel">
+    <h2>这一步的合法动作</h2>
+    <table>
+      <thead>
+        <tr><th></th><th>动作</th><th>网络给出的概率</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </section>
+</div>
+<p id="foot">每一步都是这样学。回合里的下一步，用的是执行之后的新图。</p>
+<script>
+const captions = [
+  "一张视图进入仿真。这一步的输入是当前图，加上现在能做的几个动作。",
+  "规则专家看过冲突之后，选中「把这条尺寸翻到右侧」。要记下来的就是这个下标。",
+  "网络也给每一行打一个分。开始时它更倾向整组平衡，和专家不一致。",
+  "损失只拉高专家那一行的概率，其它行下降。图本身不用人来改。",
+  "这一步执行之后，尺寸到了右侧，冲突消掉。下一步是一张新图，专家改为接受。",
+  "网络在新的一步上再次对齐专家。很多这样的一步叠起来，它就会在类似的图上做出和专家相同的选择。"
+];
+
+const steps = [
+  {
+    moved: false,
+    showScores: false,
+    chosen: -1,
+    pred: -1,
+    scores: [0, 0, 0],
+    actions: ["接受，结束本轮", "单条翻边，目标侧为右", "整组两侧平衡"]
+  },
+  {
+    moved: false,
+    showScores: false,
+    chosen: 1,
+    pred: -1,
+    scores: [0, 0, 0],
+    actions: ["接受，结束本轮", "单条翻边，目标侧为右", "整组两侧平衡"]
+  },
+  {
+    moved: false,
+    showScores: true,
+    chosen: 1,
+    pred: 2,
+    scores: [18, 27, 55],
+    actions: ["接受，结束本轮", "单条翻边，目标侧为右", "整组两侧平衡"]
+  },
+  {
+    moved: false,
+    showScores: true,
+    chosen: 1,
+    pred: 1,
+    scores: [12, 71, 17],
+    actions: ["接受，结束本轮", "单条翻边，目标侧为右", "整组两侧平衡"]
+  },
+  {
+    moved: true,
+    showScores: false,
+    chosen: 0,
+    pred: -1,
+    scores: [0, 0, 0],
+    actions: ["接受，结束本轮", "单条再翻回左侧", "整组两侧平衡"]
+  },
+  {
+    moved: true,
+    showScores: true,
+    chosen: 0,
+    pred: 0,
+    scores: [76, 14, 10],
+    actions: ["接受，结束本轮", "单条再翻回左侧", "整组两侧平衡"]
+  }
+];
+
+const sheet = document.getElementById("sheet");
+const rowsEl = document.getElementById("rows");
+const captionEl = document.getElementById("caption");
+let index = 0;
+let timer = null;
+let playing = true;
+
+function drawing(moved) {
+  const textX = moved ? 286 : 78;
+  const lineX = moved ? 250 : 48;
+  const ext1 = moved ? 250 : 118;
+  const ext2 = moved ? 250 : 118;
+  return `
+    <rect x="16" y="16" width="328" height="218" fill="#fff" stroke="#8fbf9a" stroke-width="2"/>
+    <polygon points="150,78 250,78 268,132 132,132" fill="#f3f5f7" stroke="#8b97a3" stroke-width="1.5"/>
+    <line x1="${ext1}" y1="78" x2="${lineX}" y2="46" stroke="#1f8a4c" stroke-width="1.4"/>
+    <line x1="${ext2}" y1="132" x2="${lineX}" y2="164" stroke="#1f8a4c" stroke-width="1.4"/>
+    <line x1="${lineX}" y1="46" x2="${lineX}" y2="164" stroke="#1f8a4c" stroke-width="1.6"/>
+    <polygon points="${lineX},46 ${lineX-5},56 ${lineX+5},56" fill="#1f8a4c"/>
+    <polygon points="${lineX},164 ${lineX-5},154 ${lineX+5},154" fill="#1f8a4c"/>
+    <text class="dim-label" x="${textX}" y="${moved ? 110 : 108}" text-anchor="middle">18</text>
+    ${moved ? "" : `<rect x="62" y="96" width="34" height="18" fill="none" stroke="#c4504a" stroke-width="1.2" stroke-dasharray="3 2"/>`}
+  `;
+}
+
+function render() {
+  const step = steps[index];
+  captionEl.innerHTML = captions[index];
+  sheet.innerHTML = drawing(step.moved);
+  rowsEl.innerHTML = step.actions.map((name, i) => {
+    const pick = i === step.chosen ? "pick" : "";
+    const pred = i === step.pred ? "pred" : "";
+    const width = step.showScores ? step.scores[i] : 0;
+    const label = step.showScores ? step.scores[i] + "%" : "";
+    return `<tr class="${pick} ${pred}">
+      <td class="tag">${i}</td>
+      <td>${name}</td>
+      <td style="width:42%"><div class="bar"><span style="width:${width}%"></span></div></td>
+      <td class="tag">${label}</td>
+    </tr>`;
+  }).join("");
+}
+
+function go(next) {
+  index = (next + steps.length) % steps.length;
+  render();
+}
+
+function play() {
+  clearInterval(timer);
+  timer = setInterval(() => go(index + 1), 2600);
+  playing = true;
+  document.getElementById("play").textContent = "暂停";
+  document.getElementById("play").classList.add("active");
+}
+
+function pause() {
+  clearInterval(timer);
+  playing = false;
+  document.getElementById("play").textContent = "播放";
+  document.getElementById("play").classList.remove("active");
+}
+
+document.getElementById("prev").onclick = () => { pause(); go(index - 1); };
+document.getElementById("next").onclick = () => { pause(); go(index + 1); };
+document.getElementById("play").onclick = () => playing ? pause() : play();
+
+render();
+play();
+</script>
+</body>
+</html>

@@ -5,7 +5,12 @@ __pycache__/
 venv/
 *.egg-info/
 .pytest_cache/
-data/datasets/**/runs/
+data/
+_encode_work/
+_tmp_*
+*.tgz
+docs/*.zip
+docs/_pack_transcript.py
 runs/
 *.pt
 *.pth

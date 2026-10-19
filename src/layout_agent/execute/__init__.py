@@ -33,6 +33,21 @@ class Executor:
         work_dir: Path,
     ) -> Tuple[LayoutState, str]:
         """Mutate geometry according to actions and re-render ICM into work_dir."""
+        work_dir.mkdir(parents=True, exist_ok=True)
+        s, notes = self.apply_geometry(state, actions)
+        s = self._expand_render_bbox_to_annos(s)
+        s.state_id = f"{state.state_id}_step"
+        inst = work_dir / f"{s.state_id}.instance.png"
+        obs = work_dir / f"{s.state_id}.obstacle.png"
+        s = self.perceiver.render_icm(s, inst, obs)
+        return s, ",".join(notes)
+
+    def apply_geometry(
+        self,
+        state: LayoutState,
+        actions: List[Action],
+    ) -> Tuple[LayoutState, List[str]]:
+        """Apply actions without raster I/O (candidate masks and look-ahead)."""
         s = self.snapshot(state)
         notes: List[str] = []
 
@@ -63,16 +78,10 @@ class Executor:
             elif act.type == ActionType.SET_LINEAR_LAYER_ORDER:
                 s = self._push_linears_outward(s, step=self.layer_step)
                 notes.append("layer_push")
+        return s, notes
 
-        s = self._expand_view_to_annos(s)
-        inst = work_dir / f"{s.state_id}.instance.png"
-        obs = work_dir / f"{s.state_id}.obstacle.png"
-        s.state_id = f"{state.state_id}_step"
-        s = self.perceiver.render_icm(s, inst, obs)
-        return s, ",".join(notes)
-
-    def _expand_view_to_annos(self, state: LayoutState, pad: float = 15.0) -> LayoutState:
-        """Grow view bbox so nudged annotations stay inside the frame (clears H_OOB)."""
+    def _expand_render_bbox_to_annos(self, state: LayoutState) -> LayoutState:
+        """Grow only the raster envelope; never relax the legal drawing frame."""
         from layout_agent.geometry_parts import collect_parts
 
         parts = collect_parts(state)
@@ -80,26 +89,32 @@ class Executor:
             return state
         xs: List[float] = []
         ys: List[float] = []
-        bbox = state.view.get("bbox") or {}
+        bbox = state.view.get("legal_bbox") or state.view.get("bbox") or {}
         bmin = bbox.get("min") or {}
         bmax = bbox.get("max") or {}
-        xs.extend([float(bmin.get("x", 0)), float(bmax.get("x", 100))])
-        ys.extend([float(bmin.get("y", 0)), float(bmax.get("y", 80))])
+        legal_min_x, legal_max_x = float(bmin.get("x", 0)), float(bmax.get("x", 100))
+        legal_min_y, legal_max_y = float(bmin.get("y", 0)), float(bmax.get("y", 80))
+        xs.extend([legal_min_x, legal_max_x])
+        ys.extend([legal_min_y, legal_max_y])
         for p in parts.values():
             fp = p.footprint()
             xs.extend([fp.xmin, fp.xmax])
             ys.extend([fp.ymin, fp.ymax])
-        state.view = {
-            **state.view,
-            "bbox": {
-                "min": {"x": min(xs) - pad, "y": min(ys) - pad},
-                "max": {"x": max(xs) + pad, "y": max(ys) + pad},
-            },
+        render_bbox = {
+            "min": {"x": min(xs), "y": min(ys)},
+            "max": {"x": max(xs), "y": max(ys)},
         }
+        if render_bbox == {
+            "min": {"x": legal_min_x, "y": legal_min_y},
+            "max": {"x": legal_max_x, "y": legal_max_y},
+        }:
+            state.view.pop("render_bbox", None)
+        else:
+            state.view = {**state.view, "render_bbox": render_bbox}
         return state
 
     def _view_box(self, state: LayoutState) -> Tuple[float, float, float, float, float, float]:
-        bbox = state.view.get("bbox", {})
+        bbox = state.view.get("legal_bbox") or state.view.get("bbox", {})
         bmin, bmax = bbox.get("min", {}), bbox.get("max", {})
         xmin = float(bmin.get("x", 0))
         ymin = float(bmin.get("y", 0))
@@ -515,40 +530,33 @@ class Executor:
     def _set_radial_sector(
         self, state: LayoutState, target_id: str, sector: int | None = None
     ) -> LayoutState:
-        """Try multiple sectors/lengths; pick placement minimizing hard then soft cost."""
-        from layout_agent.evaluate import Evaluator
+        """Place the target in exactly the requested sector.
 
-        ev = Evaluator(self.cfg)
-        preferred = int(sector or 0) % 8
-        sector_order = [preferred] + [s for s in range(8) if s != preferred]
-        lengths = [12.0, 18.0, 24.0, 30.0]
-        best_state = state
-        best_key: Optional[Tuple] = None
-        for s in sector_order:
-            for length in lengths:
-                cand = self.snapshot(state)
-                self._apply_radial_placement(cand, target_id, s, length)
-                rep = ev.evaluate(cand)
-                hard_t = sum(
-                    1
-                    for v in rep.hard_violations
-                    if v.a_id == target_id or v.b_id == target_id
-                )
-                key = (
-                    hard_t,
-                    float(rep.metrics.get("V_hard", 0)),
-                    float(rep.metrics.get("S_text_in_part", 0)),
-                    float(rep.metrics.get("S_leader_text", 0)),
-                    float(rep.metrics.get("P", 1e18)),
-                    length,
-                )
-                if best_key is None or key < best_key:
-                    best_key = key
-                    best_state = cand
-                    if (
-                        hard_t == 0
-                        and float(rep.metrics.get("S_leader_text", 0)) == 0
-                        and float(rep.metrics.get("S_text_in_part", 0)) == 0
-                    ):
-                        return cand
-        return best_state
+        Sector choice belongs to the policy. Searching other sectors here would
+        make several discrete actions aliases and invalidate masking/PPO
+        likelihoods. Leader length is a deterministic executor detail.
+        """
+        requested = int(sector or 0) % 8
+        target = next(
+            (
+                item
+                for item in list(state.diameters) + list(state.radials)
+                if item.id == target_id
+            ),
+            None,
+        )
+        if target is None:
+            return state
+        if target.path:
+            end = target.path[-1]
+            dx, dy = end.x - target.anchor.x, end.y - target.anchor.y
+            current_length = (dx * dx + dy * dy) ** 0.5
+        else:
+            current_length = 0.0
+        radial_length = float(
+            (self.cfg.get("execute") or {}).get("radial_length", 24.0)
+        )
+        length = current_length if current_length >= 1e-6 else radial_length
+        length = min(max(length, 12.0), 30.0)
+        self._apply_radial_placement(state, target_id, requested, length)
+        return state

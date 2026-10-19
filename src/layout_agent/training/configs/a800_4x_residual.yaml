@@ -1,0 +1,35 @@
+# 4× A800 GPUs 0-3. Real-only residual reward (no synth in val/train mix).
+# Launch:
+#   CUDA_VISIBLE_DEVICES=0,1,2,3 torchrun --standalone --nproc_per_node=4 \
+#       -m layout_agent.training.train \
+#       --manifest data/evalsys/reward_human_pairs/manifest.jsonl \
+#       --out runs/reward_human_pairs_residual \
+#       --config src/layout_agent/training/configs/a800_4x_residual.yaml
+#
+# Global batch = 8 × 4 = 32.
+# Score = formula_overall + residual(ICM RGB, formula features).
+# Zero-init residual starts at the formula ranker; BT on human pairs may
+# override only where the 578 real train labels disagree with the formula.
+# Frozen test view_keys stay out of this manifest.
+
+img_size: 256
+channels: 5
+batch_size: 8
+epochs: 60
+lr: 3.0e-4
+weight_decay: 1.0e-2
+freeze_stages: 0
+pretrained: true
+patience: 12
+eval_margin: 1.0e-6
+formula_residual: true
+residual_l2: 0.02
+num_workers: 4
+seed: 7
+amp: bf16
+scale_lr: true
+tf32: true
+pin_memory: true
+persistent_workers: true
+prefetch_factor: 2
+find_unused_parameters: false

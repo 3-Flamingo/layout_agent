@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>人工图纸对检查 · 训练/测试</title>
+<style>
+  html, body { height:100%; margin:0; overflow:hidden; }
+  body { background:#16181c; color:#e8e8e8; font-family:"Segoe UI",sans-serif; display:flex; flex-direction:column; }
+  header { flex-shrink:0; z-index:2; background:#1f2228; }
+  .toolbar {
+    display:flex; gap:12px; align-items:center; flex-wrap:nowrap;
+    padding:8px 16px; min-height:44px;
+  }
+  .toolbar-left { display:flex; gap:10px; align-items:center; flex:1; min-width:0; flex-wrap:wrap; }
+  .toolbar-nav { display:flex; gap:8px; align-items:center; flex-shrink:0; }
+  select, input, button {
+    background:#2a2e36; color:#e8e8e8; border:1px solid #555; border-radius:4px;
+    padding:6px 10px; font-size:13px;
+  }
+  button { cursor:pointer; }
+  button:hover { background:#3a3f4a; }
+  button.sel { background:#2d8a4e; border-color:#2d8a4e; }
+  button.warn { background:#8a3d2d; border-color:#8a3d2d; }
+  button.ok { background:#2d5be3; border-color:#2d5be3; }
+  button.swap { background:#a06a22; border-color:#a06a22; }
+  button.drop { background:#6b2d5a; border-color:#6b2d5a; }
+  a.live { color:#9ecbff; text-decoration:none; font-size:13px; white-space:nowrap; }
+  a.live[hidden] { display:none; }
+  .src-links { font-size:12px; color:#8aa; padding-top:2px; }
+  .src-links a { color:#9ecbff; }
+  #viewmeta a { color:#9ecbff; }
+  .badge { display:inline-block; padding:1px 8px; border-radius:10px; font-size:12px; }
+  .badge.test { background:#2d5be3; }
+  .badge.train { background:#5a4a2a; }
+  .badge.cross_view { background:#6b2d5a; }
+  .badge.cmu_perturb { background:#2d6b6b; }
+  .badge.relayout { background:#4a3d8a; }
+  .badge.swap { background:#8a3d2d; }
+      .badge.gold { background:#2d8a4e; }
+  #progress { white-space:nowrap; }
+  .hint { color:#888; font-size:12px; }
+  #viewmeta {
+    color:#bbb; font-size:12px; font-family:ui-monospace,Consolas,monospace;
+    line-height:1.55; padding:0 16px 8px;
+  }
+  #viewmeta button { margin-left:6px; padding:2px 8px; font-size:12px; }
+  #panel { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:center; padding:8px 16px; background:#1a1d23; border-bottom:1px solid #2a2e36; flex-shrink:0; }
+  #imgs { flex:1; min-height:0; display:flex; gap:10px; justify-content:center; align-items:stretch; padding:8px 12px 12px; overflow:hidden; }
+  #imgs figure { margin:0; text-align:center; flex:1; min-width:0; min-height:0; display:flex; flex-direction:column; }
+  #imgs.single figure { flex:1 1 auto; max-width:min(1100px, 96%); }
+  #imgs .frame { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  #imgs img {
+    max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain;
+    border:1px solid #333; border-radius:4px; background:#000; cursor:zoom-in;
+  }
+  .stack-box { position:relative; max-width:100%; max-height:100%; line-height:0; }
+  .stack-box img.layer-a { display:block; max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; }
+  .stack-box img.layer-b { position:absolute; left:0; top:0; width:100%; height:100%; object-fit:fill; border:none; }
+  .mode-blink .layer-b { opacity:0; }
+  .mode-blink.show-b .layer-b { opacity:1; }
+  .mode-diff { background:#000; }
+  .mode-diff .layer-b { mix-blend-mode:difference; }
+  .mode-wipe .layer-b { clip-path: inset(0 0 0 var(--wipe, 50%)); }
+  .wipe-line { position:absolute; top:0; bottom:0; left:var(--wipe, 50%); width:2px; background:#4c8dff; box-shadow:0 0 0 1px #000; pointer-events:none; }
+  .cmp { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-left:12px; padding-left:12px; border-left:1px solid #3a3f4a; }
+  figcaption { color:#aaa; padding:2px 0 0; font-size:13px; flex-shrink:0; }
+  #zoom {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:10;
+    align-items:center; justify-content:center; padding:16px; cursor:zoom-out; overflow:auto;
+  }
+  #zoom.show { display:flex; }
+  #zoom .zoom-box { position:relative; line-height:0; }
+  #zoom img { max-width:none; max-height:none; cursor:zoom-out; }
+  #zoom .zoom-box img.layer-b { position:absolute; left:0; top:0; width:100%; height:100%; object-fit:fill; border:none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <b>图纸对检查</b>
+      <span id="summary" class="hint"></span>
+      <select id="split">
+        <option value="test">测试集</option>
+        <option value="train">训练集</option>
+        <option value="cross_view">跨视图预留</option>
+        <option value="all">全部</option>
+      </select>
+      <select id="source">
+        <option value="all">全部来源</option>
+        <option value="colleague_enterprise_t3_relayout">公有云重布局</option>
+        <option value="colleague_enterprise_t3">公有云 tenant3</option>
+        <option value="colleague_zhongche">中车旧对</option>
+        <option value="cmu_perturb_perfect">CMU扰动</option>
+      </select>
+      <select id="solution"><option value="all">全部方案</option></select>
+      <select id="flag">
+        <option value="all">全部标记</option>
+        <option value="ok">已标合理</option>
+        <option value="swap">互换左右</option>
+        <option value="drop">建议删除</option>
+        <option value="bad">已标可疑</option>
+        <option value="open">未标记</option>
+      </select>
+      <label class="hint"><input type="checkbox" id="onlygold"> 只看 T2 gold</label>
+      <a class="live" id="live" href="#" target="_blank" rel="noopener" hidden>打开原图纸</a>
+      <a class="live" id="livealt" href="#" target="_blank" rel="noopener" hidden>备用投图</a>
+      <a class="live" id="liveproj" href="#" target="_blank" rel="noopener" hidden>打开项目</a>
+    </div>
+    <div class="toolbar-nav">
+      <span id="progress"></span>
+      <button id="prev">上一条</button>
+      <button id="next">下一条</button>
+      <label class="hint">跳到 <input id="jump" type="number" min="1" step="1" style="width:4.8em"></label>
+      <button id="jumpgo">跳转</button>
+    </div>
+  </div>
+  <div id="viewmeta"></div>
+</header>
+<div id="panel"></div>
+<div id="imgs"></div>
+<div id="zoom"><div class="zoom-box" id="zoombox"></div></div>
+<script src="tasks.js"></script>
+<script src="gold_ids.js"></script>
+<script>
+const ALL = window.TASKS || [];
+const SUM = window.SUMMARY || {};
+const GOLD = new Set(window.GOLD_IDS || []);
+const DSID = window.DATASET_ID || "review_human_pairs";
+const notes = JSON.parse(localStorage.getItem("notes_"+DSID) || "{}");
+function applyPresetFlags(){
+  let changed = 0;
+  for (const t of ALL){
+    if (notes[t.id] && notes[t.id].flag) continue;
+    if (!t.preflag) continue;
+    notes[t.id] = {flag: t.preflag, source: "preset"};
+    changed += 1;
+  }
+  if (changed) localStorage.setItem("notes_"+DSID, JSON.stringify(notes));
+}
+applyPresetFlags();
+let compareMode = localStorage.getItem("compare_mode_"+DSID) || "side";
+let blinkAuto = localStorage.getItem("blink_auto_"+DSID) === "1";
+let blinkShowB = false;
+let blinkTimer = null;
+let pairSrc = {a:"", b:"", capA:"左 · 缺陷", capB:"右 · 完美"};
+let filtered = [];
+let idx = 0;
+let currentTask = null;
+
+const VT = {front:"主视", left:"左视", right:"右视", top:"俯视", bottom:"仰视", rear:"后视", back:"后视", aux:"辅助"};
+function splitLabel(s){
+  return {test:"测试", train:"训练", cross_view:"跨视图", cmu_perturb:"CMU扰动", relayout:"重布局新数据"}[s] || s || "";
+}
+function sourceLabel(s){
+  return {colleague_zhongche:"中车旧对", colleague_enterprise_t3:"公有云", colleague_enterprise_t3_relayout:"公有云重布局", cmu_perturb_perfect:"CMU扰动"}[s] || s || "";
+}
+
+function solutionsInView(list){
+  const s = [...new Set(list.map(t => t.solution_id).filter(Boolean))];
+  s.sort();
+  return s;
+}
+function applyFilters(){
+  const split = document.getElementById("split").value;
+  const source = document.getElementById("source").value;
+  const solution = document.getElementById("solution").value;
+  const flag = document.getElementById("flag").value;
+  const onlyGold = document.getElementById("onlygold") && document.getElementById("onlygold").checked;
+  filtered = ALL.filter(t => {
+    if (split !== "all" && t.split !== split) return false;
+    if (source !== "all" && t.source !== source) return false;
+    if (solution !== "all" && t.solution_id !== solution) return false;
+    if (onlyGold && !GOLD.has(t.id)) return false;
+    const n = notes[t.id] && notes[t.id].flag;
+    if (flag === "ok" && n !== "ok") return false;
+    if (flag === "swap" && n !== "swap") return false;
+    if (flag === "drop" && n !== "drop") return false;
+    if (flag === "bad" && n !== "bad") return false;
+    if (flag === "open" && n) return false;
+    return true;
+  });
+  const sel = document.getElementById("solution");
+  const keep = sel.value;
+  const opts = ["<option value='all'>全部方案</option>"].concat(
+    solutionsInView(ALL.filter(t => (split==="all"||t.split===split) && (source==="all"||t.source===source)))
+      .map(id => `<option value="${id}">${id.slice(-8)}</option>`)
+  );
+  sel.innerHTML = opts.join("");
+  if ([...sel.options].some(o => o.value === keep)) sel.value = keep;
+  if (idx >= filtered.length) idx = Math.max(0, filtered.length - 1);
+}
+function persistNote(){
+  localStorage.setItem("notes_"+DSID, JSON.stringify(notes));
+}
+function officialUrl(t){
+  if (t && t.drawing_url) return t.drawing_url;
+  const m = String((t && t.view_key) || "").match(/^(\d{10,})\//);
+  if (!m) return "";
+  const sid = m[1];
+  const tenant = String((t && t.tenant_id) || "");
+  if (tenant === "250")
+    return "https://v3.private.designorder.cn/drawing/?solutionId=" + encodeURIComponent(sid) + "&tenantId=250";
+  return "https://v3.designorder.cn/drawing/?solutionId=" + encodeURIComponent(sid) + "&tenantId=" + encodeURIComponent(tenant || "3");
+}
+function altDrawingUrl(t){
+  if (t && t.drawing_url_alt) return t.drawing_url_alt;
+  const tenant = String((t && t.tenant_id) || "");
+  if (tenant === "250") return "";
+  const sid = String((t && t.solution_id) || "").trim();
+  if (!sid) return "";
+  return "https://drawing.designorder.cn/?solutionId=" + encodeURIComponent(sid) + "&tenantId=" + encodeURIComponent(tenant || "3");
+}
+function projectUrl(t){
+  if (t && t.project_url) return t.project_url;
+  const tenant = String((t && t.tenant_id) || "");
+  if (tenant === "250") return "";
+  return "https://v3.designorder.cn/shanshe-enterprise/project/2099378950165704704?tenantId=3&app=shanshe-enterprise";
+}
+function setLink(el, href, label){
+  if (!href) { el.hidden = true; return; }
+  el.hidden = false;
+  el.href = href;
+  el.textContent = label;
+}
+function figureLinks(side){
+  const t = currentTask;
+  if (!t) return "";
+  const href = officialUrl(t);
+  if (!href) return "";
+  const eid = side === "a" ? (t.perturbed_eid || "") : (t.perfect_eid || "");
+  const col = side === "a" ? "原图纸左列缺陷" : "原图纸右列完美";
+  return `<div class="src-links"><a href="${href}" target="_blank" rel="noopener">${col}</a>${eid ? " · eid " + eid : ""}</div>`;
+}
+function copyBtn(id){
+  return `<button type="button" id="${id}">复制</button>`;
+}
+function bindCopy(id, value){
+  const b = document.getElementById(id);
+  if (!b) return;
+  b.onclick = () => {
+    navigator.clipboard.writeText(value).then(() => { b.textContent = "已复制"; });
+  };
+}
+function partLocateHtml(t){
+  const part = String((t && t.part_name) || "");
+  const treeUuid = String((t && t.tree_uuid) || "");
+  const vt = VT[(t && t.view_type) || ""] || (t && t.view_type) || "";
+  if (!part && !treeUuid) {
+    return `<span class="hint">该条没有零件编号，无法在官网左树定位单图</span>`;
+  }
+  const bits = [];
+  if (part) bits.push(`零件 <b>${part}</b> ${copyBtn("copypart")}`);
+  if (treeUuid) bits.push(`零件UUID <b>${treeUuid}</b> ${copyBtn("copytree")}`);
+  if (vt) bits.push(vt);
+  bits.push(`<span class="hint">左树搜索框粘贴零件名后回车；或输入 @${treeUuid || "零件UUID"} 后回车。选中后再在该零件的视图里找${vt || "对应视图"}</span>`);
+  return bits.join(" · ");
+}
+
+const zoom = document.getElementById("zoom");
+const zoombox = document.getElementById("zoombox");
+function openZoom(src){
+  zoombox.className = "zoom-box";
+  zoombox.innerHTML = `<img src="${src}" alt="">`;
+  zoom.classList.add("show");
+}
+function openZoomStack(mode, showB){
+  zoombox.className = "zoom-box mode-" + mode + (showB ? " show-b" : "");
+  zoombox.innerHTML = `<img class="layer-a" src="${pairSrc.a}" alt="A"><img class="layer-b" src="${pairSrc.b}" alt="B">`;
+  zoom.classList.add("show");
+}
+function closeZoom(){ zoom.classList.remove("show"); zoombox.innerHTML = ""; }
+zoom.onclick = closeZoom;
+
+function stopBlinkTimer(){ if (blinkTimer) { clearInterval(blinkTimer); blinkTimer = null; } }
+function setCompareMode(m){
+  compareMode = m;
+  localStorage.setItem("compare_mode_"+DSID, m);
+  blinkShowB = false;
+  stopBlinkTimer();
+  render();
+}
+function compareCaption(){
+  if (compareMode === "blink")
+    return blinkShowB
+      ? "叠看 · 当前 完美 · 空格切换 / 按住空格看另一张"
+      : "叠看 · 当前 缺陷 · 空格切换 / 按住空格看另一张";
+  if (compareMode === "diff") return "差异 · 黑色=相同，亮色=布局改动";
+  if (compareMode === "wipe") return "刮擦 · 在图上左右拖，左缺陷 右完美";
+  return "";
+}
+function setBlinkVisible(show){
+  blinkShowB = show;
+  const stack = document.getElementById("stack");
+  if (stack && compareMode === "blink") stack.classList.toggle("show-b", show);
+  const cap = document.getElementById("cmpcap");
+  if (cap && compareMode === "blink") cap.textContent = compareCaption();
+}
+function peekOther(on){
+  if (compareMode === "blink") {
+    if (!blinkAuto) setBlinkVisible(on);
+    return;
+  }
+  if (compareMode === "side") {
+    const imgA = document.querySelector("#imgs img[alt='A']");
+    const cap = document.getElementById("capA");
+    if (!imgA) return;
+    imgA.src = on ? pairSrc.b : pairSrc.a;
+    if (cap) cap.textContent = on ? pairSrc.capA + "（现为完美，松开空格还原）" : pairSrc.capA;
+  }
+}
+function bindZoom(root){
+  root.querySelectorAll("img").forEach(img => {
+    img.onclick = () => openZoom(img.src);
+    img.title = "点击查看原图";
+  });
+}
+function bindCompareStack(stack){
+  const imgA = stack.querySelector(".layer-a");
+  const fit = () => {
+    const frame = stack.parentElement;
+    if (!frame || !imgA) return;
+    imgA.style.maxHeight = frame.clientHeight + "px";
+    imgA.style.maxWidth = frame.clientWidth + "px";
+  };
+  if (imgA.complete) fit(); else imgA.onload = fit;
+  let dragged = false;
+  const applyWipe = ev => {
+    const r = stack.getBoundingClientRect();
+    const x = Math.min(Math.max(ev.clientX - r.left, 0), r.width);
+    stack.style.setProperty("--wipe", (x / r.width * 100) + "%");
+  };
+  if (compareMode === "wipe") {
+    stack.addEventListener("pointerdown", ev => { dragged = false; stack.setPointerCapture(ev.pointerId); applyWipe(ev); });
+    stack.addEventListener("pointermove", ev => { if (!ev.buttons) return; dragged = true; applyWipe(ev); });
+  }
+  stack.addEventListener("click", ev => {
+    if (compareMode === "wipe" && dragged) { ev.preventDefault(); dragged = false; return; }
+    openZoomStack(compareMode, blinkShowB);
+  });
+}
+function startBlinkAuto(){
+  stopBlinkTimer();
+  if (!blinkAuto || compareMode !== "blink") return;
+  blinkTimer = setInterval(() => {
+    blinkShowB = !blinkShowB;
+    const stack = document.getElementById("stack");
+    if (stack) stack.classList.toggle("show-b", blinkShowB);
+    const cap = document.getElementById("cmpcap");
+    if (cap) cap.textContent = compareCaption();
+  }, 320);
+}
+function renderPair(srcA, srcB){
+  pairSrc = {a: srcA, b: srcB, capA:"左 · 缺陷", capB:"右 · 完美"};
+  const imgs = document.getElementById("imgs");
+  if (compareMode === "side") {
+    imgs.className = "";
+    imgs.innerHTML = `
+      <figure><div class="frame"><img src="${srcA}" alt="A"></div><figcaption><span id="capA">左 · 缺陷</span>${figureLinks("a")}</figcaption></figure>
+      <figure><div class="frame"><img src="${srcB}" alt="B"></div><figcaption><span id="capB">右 · 完美</span>${figureLinks("b")}</figcaption></figure>`;
+    bindZoom(imgs);
+    return;
+  }
+  imgs.className = "single";
+  const showB = compareMode === "blink" && blinkShowB ? " show-b" : "";
+  imgs.innerHTML = `
+    <figure>
+      <div class="frame">
+        <div class="stack-box mode-${compareMode}${showB}" id="stack">
+          <img class="layer-a" src="${srcA}" alt="A">
+          <img class="layer-b" src="${srcB}" alt="B">
+          ${compareMode === "wipe" ? '<div class="wipe-line"></div>' : ""}
+        </div>
+      </div>
+      <figcaption><span id="cmpcap">${compareCaption()}</span>${figureLinks("a")}</figcaption>
+    </figure>`;
+  bindCompareStack(document.getElementById("stack"));
+  startBlinkAuto();
+}
+function compareToolbar(){
+  const btn = (m, label) =>
+    `<button type="button" data-cmp="${m}" class="${compareMode===m?'sel':''}">${label}</button>`;
+  return `<span class="cmp"><span class="hint">对比</span>
+    ${btn("side","左右")}
+    ${btn("blink","叠看")}
+    ${btn("diff","差异")}
+    ${btn("wipe","刮擦")}
+    <label class="hint" ${compareMode==="side"?"":"hidden"}>按住空格：左图叠看完美</label>
+    <label class="hint" ${compareMode==="blink"?"":"hidden"}><input type="checkbox" id="blinkauto"${blinkAuto?" checked":""}> 自动闪</label>
+  </span>`;
+}
+
+function render(){
+  applyFilters();
+  document.getElementById("summary").textContent =
+    `测试 ${SUM.test||0} · 训练 ${SUM.train||0}（真实 ${SUM.train_real||0} + 扰动 ${SUM.train_synth||0}）· 跨视图预留 ${SUM.cross_view||0} · 当前筛选 ${filtered.length}`;
+  const t = filtered[idx];
+  if (!t){
+    currentTask = null;
+    document.getElementById("imgs").innerHTML = "<p style='padding:40px'>没有符合筛选的条目</p>";
+    document.getElementById("panel").innerHTML = "";
+    document.getElementById("viewmeta").textContent = "";
+    document.getElementById("progress").textContent = "0/0";
+    setLink(document.getElementById("live"), "", "");
+    setLink(document.getElementById("livealt"), "", "");
+    setLink(document.getElementById("liveproj"), "", "");
+    return;
+  }
+  currentTask = t;
+  const href = officialUrl(t);
+  setLink(document.getElementById("live"), href, t.tenant_id === "250" ? "打开中车原图纸" : "打开原图纸");
+  setLink(document.getElementById("livealt"), altDrawingUrl(t), "备用投图");
+  setLink(document.getElementById("liveproj"), projectUrl(t), "打开项目");
+  const note = notes[t.id] || {};
+  const vt = VT[t.view_type] || t.view_type || "";
+  document.getElementById("progress").textContent = `${idx+1} / ${filtered.length}`;
+  document.getElementById("jump").value = String(idx+1);
+  const name = t.solution_name ? t.solution_name + " · " : "";
+  document.getElementById("viewmeta").innerHTML =
+    `<span class="badge ${t.split}">${splitLabel(t.split)}</span>` +
+    (GOLD.has(t.id) ? ` <span class="badge gold">T2 gold</span>` : "") +
+    (t.sides_swapped ? ` <span class="badge swap">已互换左右</span>` : "") +
+    (t.preflag === "drop" ? ` <span class="badge drop">沿用建议删除</span>` : "") +
+    ` · ${sourceLabel(t.source)} · ${vt} · ` +
+    `标注 ${t.n_ann} · 姿态差 ${t.pose_delta} · ${name}<b>${t.view_key}</b> · ${t.id}<br>` +
+    (href ? `原图纸 <a href="${href}" target="_blank" rel="noopener">${href}</a>` : "原图纸链接缺失") +
+    (altDrawingUrl(t) ? ` · <a href="${altDrawingUrl(t)}" target="_blank" rel="noopener">备用</a>` : "") +
+    (projectUrl(t) ? ` · <a href="${projectUrl(t)}" target="_blank" rel="noopener">项目页</a>` : "") +
+    `<br>左缺陷 CadView ${t.perturbed_eid || "?"} · 右完美 CadView ${t.perfect_eid || "?"} · viewUuid ${t.view_uuid || "?"}` +
+    `<br>${partLocateHtml(t)}`;
+  if (t.part_name) bindCopy("copypart", t.part_name);
+  if (t.tree_uuid) bindCopy("copytree", t.tree_uuid);
+  renderPair(t.render_a, t.render_b);
+  const panel = document.getElementById("panel");
+  panel.innerHTML = `
+    <button id="markok" class="${note.flag==="ok"?"ok":""}">合理 (O)</button>
+    <button id="markswap" class="${note.flag==="swap"?"swap":""}">互换左右 (Z)</button>
+    <button id="markdrop" class="${note.flag==="drop"?"drop":""}">建议删除 (Q)</button>
+    <button id="markbad" class="${note.flag==="bad"?"warn":""}">可疑 (X)</button>
+    <button id="markclear">清除标记</button>
+    ${compareToolbar()}`;
+  const setFlag = f => { notes[t.id] = {flag:f}; persistNote(); go(1); };
+  document.getElementById("markok").onclick = () => setFlag("ok");
+  document.getElementById("markswap").onclick = () => setFlag("swap");
+  document.getElementById("markdrop").onclick = () => setFlag("drop");
+  document.getElementById("markbad").onclick = () => setFlag("bad");
+  document.getElementById("markclear").onclick = () => { delete notes[t.id]; persistNote(); render(); };
+  panel.querySelectorAll("button[data-cmp]").forEach(b => b.onclick = () => setCompareMode(b.dataset.cmp));
+  const auto = document.getElementById("blinkauto");
+  if (auto) auto.onchange = () => {
+    blinkAuto = auto.checked;
+    localStorage.setItem("blink_auto_"+DSID, blinkAuto ? "1" : "0");
+    if (blinkAuto) startBlinkAuto(); else stopBlinkTimer();
+  };
+}
+function go(d){
+  if (!filtered.length) return;
+  idx = Math.min(Math.max(idx+d, 0), filtered.length-1);
+  blinkShowB = false;
+  stopBlinkTimer();
+  closeZoom();
+  render();
+}
+["split","source","solution","flag"].forEach(id => {
+  document.getElementById(id).onchange = () => { idx = 0; closeZoom(); render(); };
+});
+const onlygold = document.getElementById("onlygold");
+if (onlygold) onlygold.onchange = () => { idx = 0; closeZoom(); render(); };
+document.getElementById("prev").onclick = () => go(-1);
+document.getElementById("next").onclick = () => go(1);
+document.getElementById("jumpgo").onclick = () => {
+  idx = Math.min(Math.max(parseInt(document.getElementById("jump").value,10)||1,1), filtered.length) - 1;
+  render();
+};
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+  if (e.key === "Escape" && zoom.classList.contains("show")){ closeZoom(); return; }
+  const t = filtered[idx]; if (!t) return;
+  if (e.code === "Space"){ e.preventDefault(); if (!e.repeat) peekOther(true); return; }
+  if (e.key === "ArrowLeft" || e.key === "ArrowUp") go(-1);
+  if (e.key === "ArrowRight" || e.key === "ArrowDown") go(1);
+  if (e.key === "o" || e.key === "O"){ notes[t.id] = {flag:"ok"}; persistNote(); go(1); }
+  if (e.key === "z" || e.key === "Z"){ notes[t.id] = {flag:"swap"}; persistNote(); go(1); }
+  if (e.key === "q" || e.key === "Q"){ notes[t.id] = {flag:"drop"}; persistNote(); go(1); }
+  if (e.key === "x" || e.key === "X"){ notes[t.id] = {flag:"bad"}; persistNote(); go(1); }
+  if (e.key === "d" || e.key === "D") setCompareMode(compareMode === "diff" ? "side" : "diff");
+  if (e.key === "w" || e.key === "W") setCompareMode(compareMode === "wipe" ? "side" : "wipe");
+  if (e.key === "s" || e.key === "S") setCompareMode("side");
+});
+document.addEventListener("keyup", e => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+  if (e.code === "Space") peekOther(false);
+});
+render();
+</script>
+</body>
+</html>

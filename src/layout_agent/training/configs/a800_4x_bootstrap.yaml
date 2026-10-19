@@ -1,0 +1,29 @@
+# 4× A800 (GPUs 0-3). Do not use devices 4-7.
+# Launch:
+#   CUDA_VISIBLE_DEVICES=0,1,2,3 torchrun --standalone --nproc_per_node=4 \
+#       -m layout_agent.training.train \
+#       --manifest data/evalsys/reward_human_pairs_synth/manifest.jsonl \
+#       --out runs/reward_human_pairs_synth \
+#       --config src/layout_agent/training/configs/a800_4x_bootstrap.yaml
+#
+# Global batch = 8 × 4 = 32.
+
+img_size: 256
+channels: 3
+batch_size: 8
+epochs: 60
+lr: 3.0e-4
+weight_decay: 1.0e-2
+freeze_stages: 2
+pretrained: false
+patience: 12
+eval_margin: 1.0e-6
+num_workers: 4
+seed: 7
+amp: bf16
+scale_lr: true
+tf32: true
+pin_memory: true
+persistent_workers: true
+prefetch_factor: 2
+find_unused_parameters: false

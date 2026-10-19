@@ -69,6 +69,16 @@ def main() -> None:
         "(sources are production snapshots, not expert finals, so a perturbation "
         "can accidentally improve the layout; such pairs are unreliable labels)",
     )
+    ap.add_argument(
+        "--skip-existing",
+        action="store_true",
+        help="skip view_keys already present in the output manifest.jsonl",
+    )
+    ap.add_argument(
+        "--live-only",
+        action="store_true",
+        help="skip synthetic/oss states that have no live solutionId",
+    )
     args = ap.parse_args()
 
     data_root = (ROOT / args.data_root) if not Path(args.data_root).is_absolute() else Path(args.data_root)
@@ -94,6 +104,16 @@ def main() -> None:
         states = states[: args.limit]
     print(f"found {len(states)} snapshot states under {data_root}")
 
+    if args.skip_existing and writer.manifest.exists():
+        for line in writer.manifest.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            rec = json.loads(line)
+            vk = rec.get("view_key")
+            if vk:
+                seen_keys.add(vk)
+        print(f"skip-existing: {len(seen_keys)} view_keys already in manifest")
+
     for sp in states:
         try:
             state = load_state(sp)
@@ -102,6 +122,11 @@ def main() -> None:
             n_skipped += 1
             continue
         vkey = view_key(state)
+        if args.live_only:
+            sid = str((state.source or {}).get("solution_id") or "")
+            if not (sid.isdigit() and len(sid) >= 10):
+                n_skipped += 1
+                continue
         if vkey in seen_keys:
             n_skipped += 1
             continue

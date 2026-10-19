@@ -76,6 +76,21 @@ class RadialAnno(BaseModel):
     dim_scale: float = 1.0
 
 
+class RoughnessAnno(BaseModel):
+    """CadUserBlock name=roughness_down. Not a layout-movable instance."""
+
+    id: str
+    insert: Point
+    rotation: float = 0.0
+    scale: float = 1.0
+    roughness_scale: float = 1.0
+    value: str = ""
+    style: int = 1
+    text_height: float = 2.5
+    triangle_side: float = 2.89
+    prefix: str = "Rz"
+
+
 class Obstacle(BaseModel):
     id: str
     kind: str = "polyline"
@@ -100,6 +115,7 @@ class LayoutState(BaseModel):
     linears: List[LinearAnno] = Field(default_factory=list)
     diameters: List[RadialAnno] = Field(default_factory=list)
     radials: List[RadialAnno] = Field(default_factory=list)
+    roughness: List[RoughnessAnno] = Field(default_factory=list)
     linear_groups: List[Dict[str, Any]] = Field(default_factory=list)
     relations: List[Dict[str, Any]] = Field(default_factory=list)
 

@@ -483,16 +483,15 @@ def _curves_pil(hist, eval_rep) -> Dict[str, Any]:
 
 def _greedy_action(env: LayoutEnv) -> Optional[int]:
     """Try each legal action on a snapshot; pick the one that most lowers P."""
-    assert env._state is not None
-    best_i, best_p = None, env._p
-    acts = env._actions
+    best_i, best_p = None, float(env.report.metrics.get("P", 0.0))
+    acts = env.legal_actions
     # skip Accept unless nothing else helps
     for i, act in enumerate(acts):
         if act.type == ActionType.ACCEPT:
             continue
         try:
-            cand, _ = env.executor.apply(env._state, [act], env.work)
-            p, _ = env._eval(cand)
+            _, report, _, _ = env.simulate_action(i)
+            p = float(report.metrics.get("P", 0.0))
         except Exception:
             continue
         if p < best_p - 1e-6:
@@ -512,50 +511,44 @@ def build_rollout() -> Dict[str, Any]:
     tmp.mkdir(exist_ok=True)
     env = LayoutEnv([ROOT / "data" / "datasets" / "demo" / "snapshots" / "case_conflict.state.json"], work_dir=tmp)
     # override: use stacked synthetic for a clearer story
-    cfg = load_config(ROOT / "config" / "default.yaml")
-    env.perceiver = Perceiver(cfg)
-    env.evaluator = Evaluator(cfg)
-    env.executor = Executor(cfg, env.perceiver)
-    env._state = env.perceiver.render_icm(
-        st, tmp / "s.instance.png", tmp / "s.obstacle.png"
-    )
-    env._p, _ = env._eval(env._state)
-    env._steps = 0
-    env._actions = enumerate_actions(env._state)
+    env.reset(options={"state": st, "index": 0})
 
     frames: List[Image.Image] = []
     log: List[Dict[str, Any]] = []
     for step in range(8):
         preview = rdir / f"step_{step:02d}.png"
-        render_preview(env._state, preview)
+        render_preview(env.state, preview)
+        p_now = float(env.report.metrics.get("P", 0.0))
+        v_hard = float(env.report.metrics.get("V_hard", 0.0))
         im = overlay_score(
             Image.open(preview).convert("RGB"),
-            f"step {step}   P={env._p:.1f}",
+            f"step {step}   P={p_now:.1f}",
             "greedy rollout（每步选使 P 下降最多的合法动作）",
             None,
         )
         frames.append(_fit(im, 900, 560))
-        log.append({"step": step, "P": env._p, "v_hard": env._eval(env._state)[1]})
+        log.append({"step": step, "P": p_now, "v_hard": v_hard})
         idx = _greedy_action(env)
         if idx is None:
             break
-        act = env._actions[idx]
+        act = env.legal_actions[idx]
         if act.type == ActionType.ACCEPT:
             log[-1]["action"] = "Accept"
             break
-        obs, r, done, info = env.step(idx)
+        obs, r, terminated, truncated, info = env.step(idx)
         log[-1]["action"] = info.get("action", {}).get("type")
         log[-1]["reward"] = r
-        if done:
+        if terminated or truncated:
             break
 
     # last frame after last step
     preview = rdir / f"step_{len(log):02d}.png"
-    render_preview(env._state, preview)
+    render_preview(env.state, preview)
+    p_end = float(env.report.metrics.get("P", 0.0))
     frames.append(
         overlay_score(
             Image.open(preview).convert("RGB"),
-            f"end   P={env._p:.1f}",
+            f"end   P={p_end:.1f}",
             "rollout finished",
             None,
         )
